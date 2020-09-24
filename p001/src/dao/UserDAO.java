@@ -2,9 +2,6 @@ package dao;
 
 import dtos.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class UserDAO {
 	public static User checkUser(String userID, String password){
 		if (userID == null) return null;
