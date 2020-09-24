@@ -1,9 +1,12 @@
 package dao;
 
+import dtos.User;
 import utills.MyConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class DAO {
 
@@ -27,4 +30,31 @@ public class DAO {
 		return  result;
 	}
 
+	public static User checkUser(String userID, String password){
+		if (userID.isBlank() || password.isBlank() ) return null;
+		String sql = "select u.userID, u.userFullName, u.userPassword, u.userStatus\n" +
+				"from tblUsers u\n" +
+				"where u.userID = ?";
+		Connection connection = MyConnection.makeConnection();
+		User user = null;
+		if (connection != null){
+			try{
+				PreparedStatement statement = connection.prepareStatement(sql);
+				statement.setString(1, userID);
+				ResultSet resultSet = statement.executeQuery();
+				if(resultSet.next() && resultSet.getString("userPassword").equals(password))
+					user = new User(resultSet.getString("userID"), resultSet.getString("userFullName"), password, resultSet.getBoolean("userStatus"));
+				statement.close();
+			} catch (SQLException | IllegalArgumentException e) {
+				e.printStackTrace();
+			}finally {
+				try{
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return user;
+	}
 }
