@@ -1,5 +1,7 @@
 package dtos;
 
+import java.util.Objects;
+
 public class Supplier {
 	private String code;
 	private String name;
@@ -71,5 +73,23 @@ public class Supplier {
 
 	public void setCollaborating(boolean collaborating) {
 		this.collaborating = collaborating;
+	}
+
+	@Override
+	public String toString() {
+		return code + '-' + name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Supplier supplier = (Supplier) o;
+		return Objects.equals(code, supplier.code);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(code, name);
 	}
 }

@@ -5,6 +5,16 @@
  */
 package gui;
 
+import dao.DAO;
+import dtos.Supplier;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.util.Vector;
+
 /**
  *
  * @author USER
@@ -14,10 +24,32 @@ public class SupplierPanel extends javax.swing.JPanel {
     /**
      * Creates new form SupplierPanel
      */
+
+    public static Vector<Supplier> suppliers = null;
+    boolean isForNew = true;
+
     public SupplierPanel() {
         initComponents();
+        suppliers = DAO.getSuppliers();
+        loadTable();
     }
 
+    private void loadTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        Vector<String> identifiers = new Vector<>();
+        identifiers.add("Code");
+        identifiers.add("Name");
+        identifiers.add("Address");
+        model.setColumnIdentifiers(identifiers);
+        for (Supplier supplier : suppliers) {
+            Vector<String> vector = new Vector<>();
+            vector.add(supplier.getCode());
+            vector.add(supplier.getName());
+            vector.add(supplier.getAddress());
+            model.addRow(vector);
+        }
+        this.table.setModel(model);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -29,7 +61,7 @@ public class SupplierPanel extends javax.swing.JPanel {
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         txtCode = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -41,32 +73,43 @@ public class SupplierPanel extends javax.swing.JPanel {
         btnSave = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Title 1", "Title 2", "Title 3"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(table);
 
         jLabel1.setText("Code");
 
         jLabel2.setText("Name");
+
+        txtName.addActionListener(this::txtNameActionPerformed);
 
         Address.setText("Address");
 
         btnCollab.setText("Collaborating");
 
         btnNew.setText("Add New");
+        btnNew.addActionListener(this::newSupplier);
 
         btnSave.setText("Save");
+        btnSave.addActionListener(this::save);
 
         btnDelete.setText("Delete");
+
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -83,11 +126,11 @@ public class SupplierPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
+                        .addComponent(txtName))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(Address, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
+                        .addComponent(txtAddress))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnCollab)
@@ -127,8 +170,79 @@ public class SupplierPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void save(ActionEvent actionEvent) {
+        if(isForNew){
+            saveNew();
+        }else{
+            saveUpdate();
+        }
+    }
 
+    private void saveUpdate() {
+        try{
+            Supplier supplier = suppliers.get(table.getSelectedRow());
+            if(supplier != null){
+                String code = txtCode.getText();
+                String name = txtName.getText();
+                String address = txtAddress.getText();
+                boolean isColab = btnCollab.isSelected();
+                if(!code.equals(supplier.getCode())){
+                    JOptionPane.showMessageDialog(null, "Supplier code can not be changed");
+                }else {
+                    Supplier newSupplier = new Supplier(code, name, address, isColab);
+                    if(DAO.updateSupplier(newSupplier))
+                        suppliers.set(table.getSelectedRow(), newSupplier);
+                    loadTable();
+                }
+            }
+        }catch (IllegalArgumentException e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
 
+    private void saveNew() {
+        try{
+            Supplier supplier = new Supplier(this.txtCode.getText(), this.txtName.getText(), this.txtAddress.getText(), btnCollab.isSelected());
+            if(DAO.insertSupplier(supplier))
+                suppliers.add(supplier);
+            else return;
+            this.loadTable();
+        }catch (IllegalArgumentException e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+    private void newSupplier(ActionEvent actionEvent) {
+        txtCode.setText("");
+        txtName.setText("");
+        txtAddress.setText("");
+        this.btnCollab.setSelected(false);
+        this.isForNew = true;
+    }
+
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+        int pos = table.getSelectedRow();
+        if(pos >= 1){
+            Supplier supplier = suppliers.get(pos);
+            this.txtName.setText(supplier.getName());
+            this.txtCode.setText(supplier.getCode());
+            this.txtAddress.setText(supplier.getAddress());
+            this.btnCollab.setEnabled(supplier.isCollaborating());
+        }
+        this.isForNew = false;
+    }//GEN-LAST:event_tableMouseClicked
+
+    private void txtNameActionPerformed(ActionEvent evt) {
+
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(()-> {
+            Frame supplier = new Frame("supplier");
+            supplier.add(new SupplierPanel());
+            supplier.setVisible(true);
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Address;
@@ -140,7 +254,7 @@ public class SupplierPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable table;
     private javax.swing.JTextField txtAddress;
     private javax.swing.JTextField txtCode;
     private javax.swing.JTextField txtName;
