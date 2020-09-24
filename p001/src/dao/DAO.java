@@ -1,7 +1,9 @@
 package dao;
 
+import dtos.Item;
 import dtos.Supplier;
 import dtos.User;
+import gui.SupplierPanel;
 import utills.MyConnection;
 
 import javax.swing.*;
@@ -110,7 +112,47 @@ public class DAO {
 		return false;
 	}
 
+	public static boolean deleteSupplier(Supplier supplier){
+		return false;
+	}
+
+	public static Vector<Item> getAllItem(){
+		String sql = "select i.itemCode, i.itemName, i.price, i.supCode, i.supplying, i.unit\n" +
+					 "from tblItems i";
+		Connection connection = MyConnection.makeConnection();
+		Vector<Item> items = new Vector<>();
+		if (connection != null){
+			try{
+				PreparedStatement statement = connection.prepareStatement(sql);
+				ResultSet resultSet = statement.executeQuery();
+				while(resultSet.next()){
+					String itemCode = resultSet.getString("itemCode");
+					String itemName = resultSet.getString("itemName");
+					double price = resultSet.getDouble("price");
+					String supCode = resultSet.getString("supCode");
+					boolean supplying = resultSet.getBoolean("supplying");
+					Supplier supplier = null;
+					for (Supplier supplier1 : SupplierPanel.suppliers)
+						if(supplier1.getCode().equals(supCode))
+							supplier = supplier1;
+					String unit = resultSet.getString("unit");
+					Item item = new Item(itemCode, itemName, unit, price, supplying, supplier);
+					items.add(item);
+				}
+			} catch (SQLException | IllegalArgumentException e) {
+				e.printStackTrace();
+			}finally {
+				try{
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return items;
+	}
+
 	public static void main(String[] args) {
-		System.out.println(getSuppliers());
+		System.out.println(getAllItem());
 	}
 }

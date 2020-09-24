@@ -12,7 +12,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 /**
@@ -25,12 +24,11 @@ public class SupplierPanel extends javax.swing.JPanel {
      * Creates new form SupplierPanel
      */
 
-    public static Vector<Supplier> suppliers = null;
+    public static Vector<Supplier> suppliers =  DAO.getSuppliers();
     boolean isForNew = true;
 
     public SupplierPanel() {
         initComponents();
-        suppliers = DAO.getSuppliers();
         loadTable();
     }
 
@@ -83,7 +81,15 @@ public class SupplierPanel extends javax.swing.JPanel {
             new String [] {
                 "Title 1", "Title 2", "Title 3"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -96,7 +102,11 @@ public class SupplierPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Name");
 
-        txtName.addActionListener(this::txtNameActionPerformed);
+        txtName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNameActionPerformed(evt);
+            }
+        });
 
         Address.setText("Address");
 
@@ -109,7 +119,6 @@ public class SupplierPanel extends javax.swing.JPanel {
         btnSave.addActionListener(this::save);
 
         btnDelete.setText("Delete");
-
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -185,13 +194,17 @@ public class SupplierPanel extends javax.swing.JPanel {
                 String code = txtCode.getText();
                 String name = txtName.getText();
                 String address = txtAddress.getText();
-                boolean isColab = btnCollab.isSelected();
+                boolean isCollaborating = btnCollab.isSelected();
                 if(!code.equals(supplier.getCode())){
                     JOptionPane.showMessageDialog(null, "Supplier code can not be changed");
                 }else {
-                    Supplier newSupplier = new Supplier(code, name, address, isColab);
-                    if(DAO.updateSupplier(newSupplier))
-                        suppliers.set(table.getSelectedRow(), newSupplier);
+                    Supplier newSupplier = new Supplier(code, name, address, isCollaborating);
+                    if(DAO.updateSupplier(newSupplier)){
+                        supplier.setAddress(newSupplier.getAddress());
+                        supplier.setName(newSupplier.getName());
+                        supplier.setCollaborating(newSupplier.isCollaborating());
+                        JOptionPane.showMessageDialog(null, "Update supplier successfully!!");
+                    }
                     loadTable();
                 }
             }
@@ -222,12 +235,12 @@ public class SupplierPanel extends javax.swing.JPanel {
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         int pos = table.getSelectedRow();
-        if(pos >= 1){
+        if(pos >= 0){
             Supplier supplier = suppliers.get(pos);
             this.txtName.setText(supplier.getName());
             this.txtCode.setText(supplier.getCode());
             this.txtAddress.setText(supplier.getAddress());
-            this.btnCollab.setEnabled(supplier.isCollaborating());
+            this.btnCollab.setSelected(supplier.isCollaborating());
         }
         this.isForNew = false;
     }//GEN-LAST:event_tableMouseClicked
@@ -241,6 +254,7 @@ public class SupplierPanel extends javax.swing.JPanel {
             Frame supplier = new Frame("supplier");
             supplier.add(new SupplierPanel());
             supplier.setVisible(true);
+           
         });
     }
 

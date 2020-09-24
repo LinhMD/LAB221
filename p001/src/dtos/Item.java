@@ -92,4 +92,15 @@ public class Item {
 		this.supplier = supplier;
 	}
 
+	@Override
+	public String toString() {
+		return "Item{" +
+				"code='" + code + '\'' +
+				", name='" + name + '\'' +
+				", unit='" + unit + '\'' +
+				", price=" + price +
+				", supplying=" + supplying +
+				", supplier=" + supplier +
+				'}';
+	}
 }
