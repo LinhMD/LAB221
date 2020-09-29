@@ -24,6 +24,7 @@ public class Item {
 			error.append(" is empty.\n");
 			if(price <= 0)
 				error.append("price must be more than 0.");
+			StringBuilder error2 = new StringBuilder();
 			throw new IllegalArgumentException(error.toString());
 		}
 		this.code = code;

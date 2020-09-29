@@ -35,20 +35,21 @@ public class DAO {
 		return  result;
 	}
 
-	public static User checkUser(String userID, String password){
-		if (userID.isBlank() || password.isBlank() ) return null;
+	public static boolean checkUser(String userID, String password){
+		if (userID.isBlank() || password.isBlank() ) return false;
 		String sql = "select u.userID, u.userFullName, u.userPassword, u.userStatus\n" +
 				"from tblUsers u\n" +
 				"where u.userID = ?";
 		Connection connection = MyConnection.makeConnection();
-		User user = null;
+		boolean check = false;
 		if (connection != null){
 			try{
+				System.out.println("here");
 				PreparedStatement statement = connection.prepareStatement(sql);
 				statement.setString(1, userID);
 				ResultSet resultSet = statement.executeQuery();
 				if(resultSet.next() && resultSet.getString("userPassword").equals(password))
-					user = new User(resultSet.getString("userID"), resultSet.getString("userFullName"), password, resultSet.getBoolean("userStatus"));
+					check = true;
 				statement.close();
 			} catch (SQLException | IllegalArgumentException e) {
 				e.printStackTrace();
@@ -60,7 +61,7 @@ public class DAO {
 				}
 			}
 		}
-		return user;
+		return check;
 	}
 
 	public static Vector<Supplier> getSuppliers(){
@@ -102,17 +103,25 @@ public class DAO {
 	}
 
 	public static boolean insertSupplier(Supplier supplier){
+		if(supplier == null) return false;
 		String sql = "insert into tblSuppliers (supCode, supName, supAddress, collaborating)\n" +
 					"values(?, ?, ?, ?)";
 		try{
 			return executeNonQuery(sql, supplier.getCode(), supplier.getName(), supplier.getAddress(), supplier.isCollaborating());
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Add new supplier failed!!");
+			JOptionPane.showMessageDialog(null, "Add supplier "+ supplier.getCode() +"failed!!");
 		}
 		return false;
 	}
 
 	public static boolean deleteSupplier(Supplier supplier){
+		String sql = "delete from dbo.tblSuppliers\n" +
+				"where supCode = ?";
+		try{
+			return executeNonQuery(sql, supplier.getCode());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Delete supplier failed!!");
+		}
 		return false;
 	}
 
@@ -152,6 +161,40 @@ public class DAO {
 		return items;
 	}
 
+	public static boolean updateItem(Item item){
+		String sql = "update tblItems\n" +
+				"set itemName = ?, price = ?, supCode = ?, supplying = ?, unit = ?\n" +
+				"where itemCode = ?";
+		try{
+			return executeNonQuery(sql, item.getName(), item.getPrice(), item.getSupplier().getCode(), item.isSupplying(), item.getUnit(), item.getCode());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Update Item"+ item.getName() +" failed!!");
+		}
+		return false;
+	}
+
+	public static boolean insertItem(Item item){
+		String sql = "insert into dbo.tblItems (itemCode, itemName, price, supCode, supplying, unit)\n" +
+				"values(?, ?, ?, ?, ?, ?)";
+		try {
+			return executeNonQuery(sql, item.getCode(), item.getName(), item.getPrice(), item.getSupplier().getCode(), item.isSupplying(), item.getUnit());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Add Item " + item.getName() + " failed!!");
+			return false;
+		}
+	}
+
+	public static boolean deleteItem(Item item){
+		String sql = "delete from dbo.tblItems\n" +
+				"where itemCode = ?";
+		try {
+			return executeNonQuery(sql, item.getCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Delete Item " + item.getName() + " failed!!");
+			return false;
+		}
+	}
 	public static void main(String[] args) {
 		System.out.println(getAllItem());
 	}

@@ -6,12 +6,14 @@
 package gui;
 
 import dao.DAO;
+import dtos.Item;
 import dtos.Supplier;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -47,6 +49,7 @@ public class SupplierPanel extends javax.swing.JPanel {
             model.addRow(vector);
         }
         this.table.setModel(model);
+        this.newSupplier(null);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -102,11 +105,7 @@ public class SupplierPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Name");
 
-        txtName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNameActionPerformed(evt);
-            }
-        });
+        txtName.addActionListener(this::txtNameActionPerformed);
 
         Address.setText("Address");
 
@@ -119,6 +118,7 @@ public class SupplierPanel extends javax.swing.JPanel {
         btnSave.addActionListener(this::save);
 
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(this::deleteSupplier);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -179,6 +179,38 @@ public class SupplierPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void deleteSupplier(ActionEvent actionEvent) {
+        int row = this.table.getSelectedRow();
+        if(row >= 0 &&  row < suppliers.size()){
+            Supplier supplier = suppliers.get(row);
+            Vector<Item> deleteItems = new Vector<>();
+            for (Item item : ItemPanel.items)
+                if (item.getSupplier().equals(supplier))
+                    deleteItems.add(item);
+            confirmAndDelete(supplier, deleteItems);
+        }
+    }
+
+    private void confirmAndDelete(Supplier supplier, List<Item> items) {
+        int confirmDialog;
+        if(items.size() > 0)
+            confirmDialog = JOptionPane.showConfirmDialog(null,
+                "There are " + items.size() + " item(s) " + supplier.getName() + " still supplying.\n" +
+                        "Do you want to delete this supplier?");
+        else
+            confirmDialog = JOptionPane.showConfirmDialog(null,  "Do you want to delete this supplier?");
+
+        if(confirmDialog == JOptionPane.YES_OPTION){
+            for (Item item : items) DAO.deleteItem(item);
+            ItemPanel.items = DAO.getAllItem();
+            if(DAO.deleteSupplier(supplier)){
+                suppliers.remove(supplier);
+                JOptionPane.showMessageDialog(null, "Delete " + supplier.getName() + " supplier successfully");
+            }
+            loadTable();
+        }
+    }
+
     private void save(ActionEvent actionEvent) {
         if(isForNew){
             saveNew();
@@ -195,18 +227,14 @@ public class SupplierPanel extends javax.swing.JPanel {
                 String name = txtName.getText();
                 String address = txtAddress.getText();
                 boolean isCollaborating = btnCollab.isSelected();
-                if(!code.equals(supplier.getCode())){
-                    JOptionPane.showMessageDialog(null, "Supplier code can not be changed");
-                }else {
-                    Supplier newSupplier = new Supplier(code, name, address, isCollaborating);
-                    if(DAO.updateSupplier(newSupplier)){
-                        supplier.setAddress(newSupplier.getAddress());
-                        supplier.setName(newSupplier.getName());
-                        supplier.setCollaborating(newSupplier.isCollaborating());
-                        JOptionPane.showMessageDialog(null, "Update supplier successfully!!");
-                    }
-                    loadTable();
+                Supplier newSupplier = new Supplier(code, name, address, isCollaborating);
+                if(DAO.updateSupplier(newSupplier)){
+                    supplier.setAddress(newSupplier.getAddress());
+                    supplier.setName(newSupplier.getName());
+                    supplier.setCollaborating(newSupplier.isCollaborating());
+                    JOptionPane.showMessageDialog(null, "Update supplier successfully!!");
                 }
+                loadTable();
             }
         }catch (IllegalArgumentException e){
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -215,10 +243,15 @@ public class SupplierPanel extends javax.swing.JPanel {
 
     private void saveNew() {
         try{
-            Supplier supplier = new Supplier(this.txtCode.getText(), this.txtName.getText(), this.txtAddress.getText(), btnCollab.isSelected());
+            String code = this.txtCode.getText();
+            if(suppliers.stream().anyMatch(s -> s.getCode().equals(code))){
+                JOptionPane.showMessageDialog(null, "Supplier code  duplicated!!");
+                return;
+            }
+            Supplier supplier = new Supplier(code , this.txtName.getText(), this.txtAddress.getText(), btnCollab.isSelected());
             if(DAO.insertSupplier(supplier))
                 suppliers.add(supplier);
-            else return;
+                JOptionPane.showMessageDialog(null, "Add new "+ supplier.getName() +"supplier successfully!!");
             this.loadTable();
         }catch (IllegalArgumentException e){
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -226,18 +259,22 @@ public class SupplierPanel extends javax.swing.JPanel {
     }
 
     private void newSupplier(ActionEvent actionEvent) {
+        txtCode.setEnabled(true);
         txtCode.setText("");
+        txtCode.requestFocus();
         txtName.setText("");
         txtAddress.setText("");
-        this.btnCollab.setSelected(false);
+        this.btnCollab.setSelected(true);
         this.isForNew = true;
     }
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         int pos = table.getSelectedRow();
         if(pos >= 0){
+            txtCode.setEnabled(false);
             Supplier supplier = suppliers.get(pos);
             this.txtName.setText(supplier.getName());
+            this.txtName.requestFocus();
             this.txtCode.setText(supplier.getCode());
             this.txtAddress.setText(supplier.getAddress());
             this.btnCollab.setSelected(supplier.isCollaborating());
@@ -254,7 +291,6 @@ public class SupplierPanel extends javax.swing.JPanel {
             Frame supplier = new Frame("supplier");
             supplier.add(new SupplierPanel());
             supplier.setVisible(true);
-           
         });
     }
 
