@@ -6,11 +6,9 @@
 package gui;
 
 import dao.DAO;
-import dtos.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 /**
  *
@@ -111,7 +109,11 @@ public class LoginFrame extends javax.swing.JFrame {
             pass.append(c);
         }
         if(DAO.checkUser(this.txtID.getText(), pass.toString())){
-            EventQueue.invokeLater(()-> new MainFrame(null).setVisible(true));
+            EventQueue.invokeLater(()-> {
+                MainFrame mainFrame = new MainFrame(null);
+                mainFrame.setVisible(true);
+                mainFrame.setLocationRelativeTo(null);
+            });
             this.dispose();
         }else
             JOptionPane.showMessageDialog(null, "Login Failed!!");
@@ -129,7 +131,11 @@ public class LoginFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new LoginFrame().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
+            loginFrame.setLocationRelativeTo(null);
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

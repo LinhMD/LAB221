@@ -6,6 +6,7 @@
 package gui;
 
 import dao.DAO;
+import dao.ItemDAO;
 import dao.SupplierDAO;
 import dtos.Item;
 import dtos.Supplier;
@@ -202,8 +203,8 @@ public class SupplierPanel extends javax.swing.JPanel {
             confirmDialog = JOptionPane.showConfirmDialog(null,  "Do you want to delete this supplier?");
 
         if(confirmDialog == JOptionPane.YES_OPTION){
-            for (Item item : items) DAO.deleteItem(item);
-            ItemPanel.items = DAO.getAllItem();
+            for (Item item : items) ItemDAO.deleteItem(item);
+            ItemPanel.items = ItemDAO.getAllItem();
             if(SupplierDAO.deleteSupplier(supplier)){
                 suppliers.remove(supplier);
                 JOptionPane.showMessageDialog(null, "Delete " + supplier.getName() + " supplier successfully");
