@@ -105,8 +105,14 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_txtIDActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        if(DAO.checkUser(this.txtID.getText(), Arrays.toString(this.txtPassword.getPassword()))){
-            new MainFrame(null);
+        StringBuilder pass = new StringBuilder();
+        char[] password = txtPassword.getPassword();
+        for (char c : password) {
+            pass.append(c);
+        }
+        if(DAO.checkUser(this.txtID.getText(), pass.toString())){
+            EventQueue.invokeLater(()-> new MainFrame(null).setVisible(true));
+            this.dispose();
         }else
             JOptionPane.showMessageDialog(null, "Login Failed!!");
     }//GEN-LAST:event_btnLoginActionPerformed

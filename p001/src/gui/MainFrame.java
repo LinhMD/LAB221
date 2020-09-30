@@ -7,6 +7,9 @@ package gui;
 
 import dtos.User;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  *
  * @author USER
@@ -25,6 +28,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.setTitle("Main frame");
         this.jTabbedPane2.addTab("Supplier", supplierPanel);
         this.jTabbedPane2.addTab("Item", itemPanel);
+        this.jTabbedPane2.addChangeListener(e -> {
+            itemPanel.loadTable();
+            supplierPanel.loadTable();
+        });
     }
 
     /**
@@ -44,7 +51,7 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

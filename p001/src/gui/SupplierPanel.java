@@ -34,7 +34,7 @@ public class SupplierPanel extends javax.swing.JPanel {
         loadTable();
     }
 
-    private void loadTable() {
+    public void loadTable() {
         DefaultTableModel model = new DefaultTableModel();
         Vector<String> identifiers = new Vector<>();
         identifiers.add("Code");

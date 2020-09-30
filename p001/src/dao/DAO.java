@@ -48,8 +48,12 @@ public class DAO {
 				PreparedStatement statement = connection.prepareStatement(sql);
 				statement.setString(1, userID);
 				ResultSet resultSet = statement.executeQuery();
-				if(resultSet.next() && resultSet.getString("userPassword").equals(password))
+				if(resultSet.next() && resultSet.getString("userPassword").equals(password)){
 					check = true;
+					System.out.println("here 2");
+
+				}
+				System.out.println(password);
 				statement.close();
 			} catch (SQLException | IllegalArgumentException e) {
 				e.printStackTrace();

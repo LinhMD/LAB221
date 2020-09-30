@@ -17,8 +17,22 @@ public class Supplier {
 
 
 	public Supplier(String code, String name, String address, boolean collaborating) throws IllegalArgumentException {
+		StringBuilder error = new StringBuilder();
+
+		if(code == null || name == null || address == null){
+			error.append("Supplier ");
+			if(code == null)
+				error.append("code, ");
+			if(name == null)
+				error.append("name, ");
+			if(address == null)
+				error.append("address, ");
+			error.deleteCharAt(error.lastIndexOf(","));
+			error.append(" is empty.");
+			throw new IllegalArgumentException(error.toString());
+		}
+
 		if (code.isBlank() || name.isBlank() || address.isBlank()){
-			StringBuilder error = new StringBuilder();
 			error.append("Supplier ");
 			if (code.isBlank())
 				error.append(" code,");
@@ -30,6 +44,20 @@ public class Supplier {
 			error.append(" is empty.");
 			throw new IllegalArgumentException(error.toString());
 		}
+
+		if(code.length() > 10 || name.length() > 50 || address.length() > 50){
+			error.append("Supplier ");
+			if (code.length() > 10)
+				error.append(" code(max: 10),");
+			if(name.length() > 50)
+				error.append(" name(max: 50),");
+			if (address.length() > 50)
+				error.append(" address(max: 50),");
+			error.deleteCharAt(error.lastIndexOf(","));
+			error.append(" is too long.");
+			throw new IllegalArgumentException(error.toString());
+		}
+
 		this.code = code;
 		this.name = name;
 		this.address = address;

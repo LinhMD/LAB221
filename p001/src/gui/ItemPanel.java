@@ -34,8 +34,11 @@ public class ItemPanel extends javax.swing.JPanel {
         loadTable();
         updateCbxSupplier();
     }
-
-    private void loadTable() {
+    /* update item table base on item list
+     *
+     *
+     * */
+    public void loadTable() {
         DefaultTableModel model = new DefaultTableModel();
         Vector<String> identifiers = new Vector<>();
         identifiers.add("Code");
@@ -58,7 +61,10 @@ public class ItemPanel extends javax.swing.JPanel {
         this.jTable1.setModel(model);
         this.newClick(null);
     }
-
+    /*
+    * update item display base on item selected in table
+    * also update cbxSupplier
+    * */
     private void tableClick(){
         int pos = jTable1.getSelectedRow();
         this.isForNew = false;
@@ -76,7 +82,10 @@ public class ItemPanel extends javax.swing.JPanel {
             }
         }
     }
-
+    /*
+    * update supplier cbox and return the list of collab supplier
+    *
+    * */
     private Vector<Supplier> updateCbxSupplier() {
         Vector<Supplier> collabSupplier = new Vector<>();
         for (Supplier supplier : SupplierPanel.suppliers)
@@ -86,6 +95,9 @@ public class ItemPanel extends javax.swing.JPanel {
         return collabSupplier;
     }
 
+    /*
+    * when new button click everything enable and clear for new info
+    * */
     private void newClick(ActionEvent actionEvent) {
         this.txtCode.setEnabled(true);
         this.txtCode.requestFocus();
@@ -95,6 +107,7 @@ public class ItemPanel extends javax.swing.JPanel {
         this.txtUnit.setText("");
         this.jRadioButton1.setSelected(true);
         this.isForNew = true;
+        updateCbxSupplier();
     }
 
     private void save(ActionEvent actionEvent) {
@@ -104,7 +117,10 @@ public class ItemPanel extends javax.swing.JPanel {
             updateItem();
         }
     }
-
+    /*
+    * update selected item
+    * in case shit fuk up, update item list form DB
+    * */
     private void updateItem() {
         try{
             Item newItem = this.getItem(this.txtCode.getText());
@@ -120,7 +136,10 @@ public class ItemPanel extends javax.swing.JPanel {
             loadTable();
         }
     }
-
+    /*
+    * insert new item into DB and item list
+    * in case fuk up, update item list base on DB
+    * */
     private void insertNewItem() {
         String code = this.txtCode.getText();
         if (items.stream().anyMatch(item -> item.getCode().equals(code))){
@@ -128,7 +147,7 @@ public class ItemPanel extends javax.swing.JPanel {
         }else {
             try{
                 Item newItem = getItem(code);
-                if(DAO.insertItem(newItem) && items.add(newItem))
+                if(DAO.insertItem(newItem)) if (items.add(newItem))
                     JOptionPane.showMessageDialog(null, "Add item successfully!!");
                 else
                     items = DAO.getAllItem();
@@ -144,17 +163,11 @@ public class ItemPanel extends javax.swing.JPanel {
         if (row >= 0 && row < items.size()){
             Item deleteItem = items.get(row);
             int confirm_delete = JOptionPane.showConfirmDialog(null, "Do you want to delete item " + deleteItem.getName() + "?", "Confirm delete", JOptionPane.YES_NO_CANCEL_OPTION);
-            if(confirm_delete == JOptionPane.YES_OPTION){
-                if(DAO.deleteItem(deleteItem)){
-                    items.remove(deleteItem);
-                    JOptionPane.showMessageDialog(null, "Delete Item successfully");
-                    this.loadTable();
-                }
-            }else {
+            if(confirm_delete == JOptionPane.YES_OPTION) if (DAO.deleteItem(deleteItem)) if (items.remove(deleteItem))
+                JOptionPane.showMessageDialog(null, "Delete Item successfully");
+            else
                 items = DAO.getAllItem();
-                this.loadTable();
-            }
-
+            this.loadTable();
         }
     }
     private Item getItem(String code) throws IllegalArgumentException{
@@ -214,7 +227,13 @@ public class ItemPanel extends javax.swing.JPanel {
         jTable1.setColumnSelectionAllowed(true);
         jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jTable1.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jTable1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                tableClick();
+            }
+        });
 
         jLabel1.setText("Item Code");
 
