@@ -70,8 +70,12 @@ public class Supplier {
 	}
 
 	public void setCode(String code) {
+		if (code == null)
+			throw new IllegalArgumentException("Supplier code invalid");
 		if (code.isBlank())
 			throw new IllegalArgumentException("Supplier code is empty");
+		if (code.length() > 10)
+			throw new IllegalArgumentException("Supplier code is too long (max: 10)");
 		else this.code = code;
 	}
 
@@ -80,8 +84,12 @@ public class Supplier {
 	}
 
 	public void setName(String name) {
+		if (name == null)
+			throw new IllegalArgumentException("Supplier name invalid");
 		if (name.isBlank())
 			throw new IllegalArgumentException("Supplier name is empty");
+		if (name.length() > 50)
+			throw new IllegalArgumentException("Supplier name is too long (max: 50)");
 		else this.name = name;
 	}
 
@@ -90,8 +98,12 @@ public class Supplier {
 	}
 
 	public void setAddress(String address) {
+		if (address == null)
+			throw new IllegalArgumentException("Supplier address invalid");
 		if (address.isBlank())
 			throw new IllegalArgumentException("Supplier address is empty");
+		if (address.length() > 50)
+			throw new IllegalArgumentException("Supplier address is too long (max: 50)");
 		else this.address = address;
 	}
 

@@ -9,24 +9,51 @@ public class Item {
 	private Supplier supplier;
 
 	public Item(String code, String name, String unit, double price, boolean supplying, Supplier supplier) throws IllegalArgumentException {
-		if (code.isBlank() || name.isBlank() || unit.isBlank() || price <= 0 || supplier == null){
-			StringBuilder error = new StringBuilder();
+		StringBuilder error = new StringBuilder();
+		//check null
+		if (code == null || name == null || unit == null|| supplier == null){
 			error.append("Item ");
-			if (code.isBlank())
-				error.append(" code,");
-			if(name.isBlank())
-				error.append(" name,");
-			if(unit.isBlank())
-				error.append(" unit,");
-			if(supplier == null)
-				error.append(" supplier,");
+			if (code == null)
+				error.append("code, ");
+			if (name == null)
+				error.append("name, ");
+			if (unit == null)
+				error.append("unit, ");
+			if (supplier == null)
+				error.append("supplier, ");
 			error.deleteCharAt(error.lastIndexOf(","));
-			error.append(" is empty.\n");
-			if(price <= 0)
-				error.append("price must be more than 0.");
-			StringBuilder error2 = new StringBuilder();
+			error.append(" invalid.\n");
 			throw new IllegalArgumentException(error.toString());
 		}
+		//check basics stuff
+		if (code.isBlank() || name.isBlank() || unit.isBlank() || price <= 0){
+			error.append("Item ");
+			if (code.isBlank())
+				error.append("code, ");
+			if (name.isBlank())
+				error.append("name, ");
+			if (unit.isBlank())
+				error.append("unit, ");
+			error.deleteCharAt(error.lastIndexOf(","));
+			error.append(" is empty.\n");
+			if (price <= 0)
+				error.append("price must be more than 0.");
+			throw new IllegalArgumentException(error.toString());
+		}
+		//check length
+		if(code.length() > 10 || name.length() > 50 || unit.length() > 50){
+			error.append("Item ");
+			if (code.length() > 10)
+				error.append("code(max: 10), ");
+			if (name.length() >50)
+				error.append("name(max: 50), ");
+			if (unit.length() > 50)
+				error.append("unit(max: 50), ");
+			error.deleteCharAt(error.lastIndexOf(","));
+			error.append(" is too long.\n");
+			throw new IllegalArgumentException(error.toString());
+		}
+
 		this.code = code;
 		this.name = name;
 		this.unit = unit;
@@ -40,8 +67,12 @@ public class Item {
 	}
 
 	public void setCode(String code) throws IllegalArgumentException {
+		if(code == null)
+			throw new IllegalArgumentException("Item code invalid.");
 		if(code.isBlank())
-			throw new IllegalArgumentException("Item code can not be empty");
+			throw new IllegalArgumentException("Item code can not be empty.");
+		if(code.length() > 10)
+			throw new IllegalArgumentException("item code is too long (max:10).");
 		this.code = code;
 	}
 
@@ -50,8 +81,12 @@ public class Item {
 	}
 
 	public void setName(String name) throws IllegalArgumentException {
+		if(name == null)
+			throw new IllegalArgumentException("Item name invalid.");
 		if(name.isBlank())
-			throw new IllegalArgumentException("Item name can not be empty");
+			throw new IllegalArgumentException("Item name can not be empty.");
+		if(name.length() > 10)
+			throw new IllegalArgumentException("item name is too long (max:50).");
 		this.name = name;
 	}
 
@@ -60,8 +95,12 @@ public class Item {
 	}
 
 	public void setUnit(String unit) throws IllegalArgumentException {
+		if(unit == null)
+			throw new IllegalArgumentException("Item unit invalid.");
 		if(unit.isBlank())
-			throw new IllegalArgumentException("Item Unit can not be empty");
+			throw new IllegalArgumentException("Item unit can not be empty.");
+		if(unit.length() > 10)
+			throw new IllegalArgumentException("item unit is too long (max:50).");
 		this.unit = unit;
 	}
 

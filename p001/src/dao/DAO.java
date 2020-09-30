@@ -34,6 +34,30 @@ public class DAO {
 		}
 		return  result;
 	}
+	public static Vector<Vector<String>> executeQuery(String sqlStatement,int ColumnNumber,Object... values) throws Exception{
+		Connection cnn = null;
+		PreparedStatement pre = null;
+		Vector<Vector<String>>  productList = null;
+		int index = 1;
+		try{
+			cnn = MyConnection.makeConnection();
+			if(cnn == null) throw new RuntimeException("Shit went down");
+			productList = new Vector<Vector<String>>();
+			pre = cnn.prepareStatement(sqlStatement);
+			ResultSet rs = pre.executeQuery();
+			while(rs.next()) {
+				Vector<String> productDetail = new Vector<String>();
+				for(index = 1;index<=ColumnNumber;index++) productDetail.add(rs.getString(index));
+
+				productList.add(productDetail);
+			}
+		} catch(Exception ex){
+			throw new Exception(ex.getMessage());
+		} finally{
+			if(cnn != null) cnn.close();
+		}
+		return productList;
+	}
 
 	public static boolean checkUser(String userID, String password){
 		if (userID.isBlank() || password.isBlank() ) return false;
@@ -51,7 +75,6 @@ public class DAO {
 				if(resultSet.next() && resultSet.getString("userPassword").equals(password)){
 					check = true;
 					System.out.println("here 2");
-
 				}
 				System.out.println(password);
 				statement.close();
@@ -66,140 +89,5 @@ public class DAO {
 			}
 		}
 		return check;
-	}
-
-	public static Vector<Supplier> getSuppliers(){
-		String sql = "select s.supCode, s.supName, s.supAddress, s.collaborating\n" +
-					"from tblSuppliers s";
-		Connection connection = MyConnection.makeConnection();
-		Vector<Supplier> suppliers = new Vector<>();
-		if (connection != null){
-			try{
-				PreparedStatement statement = connection.prepareStatement(sql);
-				ResultSet resultSet = statement.executeQuery();
-				while(resultSet.next()){
-					Supplier supplier = new Supplier(resultSet.getString("supCode"), resultSet.getString("supName"), resultSet.getString("supAddress"), resultSet.getBoolean("collaborating"));
-					suppliers.add(supplier);
-				}
-			} catch (SQLException | IllegalArgumentException e) {
-				e.printStackTrace();
-			}finally {
-				try{
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return suppliers;
-	}
-
-	public static boolean updateSupplier(Supplier supplier){
-		String sql = "update tblSuppliers\n" +
-					"set supAddress = ?, supName = ?, collaborating = ?\n" +
-					"where supCode = ?";
-		try{
-			return executeNonQuery(sql, supplier.getAddress(), supplier.getName(), supplier.isCollaborating(), supplier.getCode());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Update failed!!");
-		}
-		return false;
-	}
-
-	public static boolean insertSupplier(Supplier supplier){
-		if(supplier == null) return false;
-		String sql = "insert into tblSuppliers (supCode, supName, supAddress, collaborating)\n" +
-					"values(?, ?, ?, ?)";
-		try{
-			return executeNonQuery(sql, supplier.getCode(), supplier.getName(), supplier.getAddress(), supplier.isCollaborating());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Add supplier "+ supplier.getCode() +"failed!!");
-		}
-		return false;
-	}
-
-	public static boolean deleteSupplier(Supplier supplier){
-		String sql = "delete from dbo.tblSuppliers\n" +
-				"where supCode = ?";
-		try{
-			return executeNonQuery(sql, supplier.getCode());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Delete supplier failed!!");
-		}
-		return false;
-	}
-
-	public static Vector<Item> getAllItem(){
-		String sql = "select i.itemCode, i.itemName, i.price, i.supCode, i.supplying, i.unit\n" +
-					 "from tblItems i";
-		Connection connection = MyConnection.makeConnection();
-		Vector<Item> items = new Vector<>();
-		if (connection != null){
-			try{
-				PreparedStatement statement = connection.prepareStatement(sql);
-				ResultSet resultSet = statement.executeQuery();
-				while(resultSet.next()){
-					String itemCode = resultSet.getString("itemCode");
-					String itemName = resultSet.getString("itemName");
-					double price = resultSet.getDouble("price");
-					String supCode = resultSet.getString("supCode");
-					boolean supplying = resultSet.getBoolean("supplying");
-					Supplier supplier = null;
-					for (Supplier supplier1 : SupplierPanel.suppliers)
-						if(supplier1.getCode().equals(supCode))
-							supplier = supplier1;
-					String unit = resultSet.getString("unit");
-					Item item = new Item(itemCode, itemName, unit, price, supplying, supplier);
-					items.add(item);
-				}
-			} catch (SQLException | IllegalArgumentException e) {
-				e.printStackTrace();
-			}finally {
-				try{
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return items;
-	}
-
-	public static boolean updateItem(Item item){
-		String sql = "update tblItems\n" +
-				"set itemName = ?, price = ?, supCode = ?, supplying = ?, unit = ?\n" +
-				"where itemCode = ?";
-		try{
-			return executeNonQuery(sql, item.getName(), item.getPrice(), item.getSupplier().getCode(), item.isSupplying(), item.getUnit(), item.getCode());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Update Item"+ item.getName() +" failed!!");
-		}
-		return false;
-	}
-
-	public static boolean insertItem(Item item){
-		String sql = "insert into dbo.tblItems (itemCode, itemName, price, supCode, supplying, unit)\n" +
-				"values(?, ?, ?, ?, ?, ?)";
-		try {
-			return executeNonQuery(sql, item.getCode(), item.getName(), item.getPrice(), item.getSupplier().getCode(), item.isSupplying(), item.getUnit());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Add Item " + item.getName() + " failed!!");
-			return false;
-		}
-	}
-
-	public static boolean deleteItem(Item item){
-		String sql = "delete from dbo.tblItems\n" +
-				"where itemCode = ?";
-		try {
-			return executeNonQuery(sql, item.getCode());
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Delete Item " + item.getName() + " failed!!");
-			return false;
-		}
-	}
-	public static void main(String[] args) {
-		System.out.println(getAllItem());
 	}
 }

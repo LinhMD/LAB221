@@ -6,6 +6,7 @@
 package gui;
 
 import dao.DAO;
+import dao.ItemDAO;
 import dtos.Item;
 import dtos.Supplier;
 
@@ -26,7 +27,7 @@ public class ItemPanel extends javax.swing.JPanel {
     /**
      * Creates new form ItemPanel
      */
-    public static Vector<Item> items = dao.DAO.getAllItem();
+    public static Vector<Item> items = ItemDAO.getAllItem();
     boolean isForNew = true;
 
     public ItemPanel() {
@@ -124,7 +125,7 @@ public class ItemPanel extends javax.swing.JPanel {
     private void updateItem() {
         try{
             Item newItem = this.getItem(this.txtCode.getText());
-            if (DAO.updateItem(newItem)){
+            if (ItemDAO.updateItem(newItem)){
                 items.set(this.jTable1.getSelectedRow(), newItem);
                 JOptionPane.showMessageDialog(null, "Update item " + newItem.getName() + " successfully!!");
                 this.loadTable();
@@ -132,7 +133,7 @@ public class ItemPanel extends javax.swing.JPanel {
         }catch (IllegalArgumentException ex){
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }catch (Exception e){
-            items = DAO.getAllItem();
+            items = ItemDAO.getAllItem();
             loadTable();
         }
     }
@@ -144,13 +145,13 @@ public class ItemPanel extends javax.swing.JPanel {
         String code = this.txtCode.getText();
         if (items.stream().anyMatch(item -> item.getCode().equals(code))){
             JOptionPane.showMessageDialog(null, "Item code duplicate!!!");
-        }else {
+        } else {
             try{
                 Item newItem = getItem(code);
-                if(DAO.insertItem(newItem)) if (items.add(newItem))
+                if(ItemDAO.insertItem(newItem)) if (items.add(newItem))
                     JOptionPane.showMessageDialog(null, "Add item successfully!!");
                 else
-                    items = DAO.getAllItem();
+                    items = ItemDAO.getAllItem();
                 this.loadTable();
             }catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -163,13 +164,14 @@ public class ItemPanel extends javax.swing.JPanel {
         if (row >= 0 && row < items.size()){
             Item deleteItem = items.get(row);
             int confirm_delete = JOptionPane.showConfirmDialog(null, "Do you want to delete item " + deleteItem.getName() + "?", "Confirm delete", JOptionPane.YES_NO_CANCEL_OPTION);
-            if(confirm_delete == JOptionPane.YES_OPTION) if (DAO.deleteItem(deleteItem)) if (items.remove(deleteItem))
+            if(confirm_delete == JOptionPane.YES_OPTION) if (ItemDAO.deleteItem(deleteItem)) if (items.remove(deleteItem))
                 JOptionPane.showMessageDialog(null, "Delete Item successfully");
             else
-                items = DAO.getAllItem();
+                items = ItemDAO.getAllItem();
             this.loadTable();
         }
     }
+
     private Item getItem(String code) throws IllegalArgumentException{
         String name = this.txtName.getText();
         String unit = this.txtUnit.getText();

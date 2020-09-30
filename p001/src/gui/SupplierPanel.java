@@ -6,6 +6,7 @@
 package gui;
 
 import dao.DAO;
+import dao.SupplierDAO;
 import dtos.Item;
 import dtos.Supplier;
 
@@ -26,7 +27,7 @@ public class SupplierPanel extends javax.swing.JPanel {
      * Creates new form SupplierPanel
      */
 
-    public static Vector<Supplier> suppliers =  DAO.getSuppliers();
+    public static Vector<Supplier> suppliers =  SupplierDAO.getSuppliers();
     boolean isForNew = true;
 
     public SupplierPanel() {
@@ -203,7 +204,7 @@ public class SupplierPanel extends javax.swing.JPanel {
         if(confirmDialog == JOptionPane.YES_OPTION){
             for (Item item : items) DAO.deleteItem(item);
             ItemPanel.items = DAO.getAllItem();
-            if(DAO.deleteSupplier(supplier)){
+            if(SupplierDAO.deleteSupplier(supplier)){
                 suppliers.remove(supplier);
                 JOptionPane.showMessageDialog(null, "Delete " + supplier.getName() + " supplier successfully");
             }
@@ -228,7 +229,7 @@ public class SupplierPanel extends javax.swing.JPanel {
                 String address = txtAddress.getText();
                 boolean isCollaborating = btnCollab.isSelected();
                 Supplier newSupplier = new Supplier(code, name, address, isCollaborating);
-                if(DAO.updateSupplier(newSupplier)){
+                if(SupplierDAO.updateSupplier(newSupplier)){
                     supplier.setAddress(newSupplier.getAddress());
                     supplier.setName(newSupplier.getName());
                     supplier.setCollaborating(newSupplier.isCollaborating());
@@ -249,7 +250,7 @@ public class SupplierPanel extends javax.swing.JPanel {
                 return;
             }
             Supplier supplier = new Supplier(code , this.txtName.getText(), this.txtAddress.getText(), btnCollab.isSelected());
-            if(DAO.insertSupplier(supplier))
+            if(SupplierDAO.insertSupplier(supplier))
                 suppliers.add(supplier);
                 JOptionPane.showMessageDialog(null, "Add new "+ supplier.getName() +"supplier successfully!!");
             this.loadTable();
