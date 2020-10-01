@@ -21,6 +21,8 @@ public class LoginFrame extends javax.swing.JFrame {
      */
     public LoginFrame() {
         initComponents();
+        txtID.requestFocus();
+        txtPassword.setText("");
     }
 
     /**
@@ -108,15 +110,17 @@ public class LoginFrame extends javax.swing.JFrame {
         for (char c : password) {
             pass.append(c);
         }
-        if(DAO.checkUser(this.txtID.getText(), pass.toString())){
+        if (DAO.checkUser(this.txtID.getText(), pass.toString())){
             EventQueue.invokeLater(()-> {
                 MainFrame mainFrame = new MainFrame(null);
                 mainFrame.setVisible(true);
                 mainFrame.setLocationRelativeTo(null);
             });
             this.dispose();
-        }else
+        } else{
             JOptionPane.showMessageDialog(null, "Login Failed!!");
+            txtID.requestFocus();
+        }
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

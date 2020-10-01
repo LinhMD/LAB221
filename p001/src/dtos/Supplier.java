@@ -57,7 +57,7 @@ public class Supplier {
 			error.append(" is too long.");
 			throw new IllegalArgumentException(error.toString());
 		}
-
+		System.out.println("here3");
 		this.code = code;
 		this.name = name;
 		this.address = address;

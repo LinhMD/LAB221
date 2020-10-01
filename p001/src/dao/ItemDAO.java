@@ -31,7 +31,7 @@ public class ItemDAO {
 					String supCode = resultSet.getString("supCode");
 					boolean supplying = resultSet.getBoolean("supplying");
 					Supplier supplier = null;
-					for (Supplier supplier1 : SupplierPanel.suppliers)
+					for (Supplier supplier1 : SupplierPanel.SUPPLIER)
 						if(supplier1.getCode().equals(supCode))
 							supplier = supplier1;
 					String unit = resultSet.getString("unit");

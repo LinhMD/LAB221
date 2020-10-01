@@ -5,7 +5,6 @@
  */
 package gui;
 
-import dao.DAO;
 import dao.ItemDAO;
 import dtos.Item;
 import dtos.Supplier;
@@ -27,7 +26,7 @@ public class ItemPanel extends javax.swing.JPanel {
     /**
      * Creates new form ItemPanel
      */
-    public static Vector<Item> items = ItemDAO.getAllItem();
+    public static Vector<Item> ITEMS = ItemDAO.getAllItem();
     boolean isForNew = true;
 
     public ItemPanel() {
@@ -41,6 +40,7 @@ public class ItemPanel extends javax.swing.JPanel {
      * */
     public void loadTable() {
         DefaultTableModel model = new DefaultTableModel();
+        //setIdentify vector
         Vector<String> identifiers = new Vector<>();
         identifiers.add("Code");
         identifiers.add("Name");
@@ -49,7 +49,8 @@ public class ItemPanel extends javax.swing.JPanel {
         identifiers.add("Price");
         identifiers.add("Supplying");
         model.setColumnIdentifiers(identifiers);
-        for (Item item : items) {
+        //Add data to model
+        for (Item item : ITEMS) {
             Vector<Object> row = new Vector<>();
             row.add(item.getCode());
             row.add(item.getName());
@@ -67,10 +68,11 @@ public class ItemPanel extends javax.swing.JPanel {
     * also update cbxSupplier
     * */
     private void tableClick(){
+        //get item selected from table
         int pos = jTable1.getSelectedRow();
         this.isForNew = false;
-        if(pos >= 0 && pos < items.size()){
-            Item item = items.get(pos);
+        if(pos >= 0 && pos < ITEMS.size()){
+            Item item = ITEMS.get(pos);
             this.txtCode.setText(item.getCode());
             this.txtCode.setEnabled(false);
             this.txtName.setText(item.getName());
@@ -89,7 +91,7 @@ public class ItemPanel extends javax.swing.JPanel {
     * */
     private Vector<Supplier> updateCbxSupplier() {
         Vector<Supplier> collabSupplier = new Vector<>();
-        for (Supplier supplier : SupplierPanel.suppliers)
+        for (Supplier supplier : SupplierPanel.SUPPLIER)
             if (supplier.isCollaborating())
                 collabSupplier.add(supplier);
         this.cbxSupplier.setModel(new  DefaultComboBoxModel<>(collabSupplier));
@@ -126,14 +128,14 @@ public class ItemPanel extends javax.swing.JPanel {
         try{
             Item newItem = this.getItem(this.txtCode.getText());
             if (ItemDAO.updateItem(newItem)){
-                items.set(this.jTable1.getSelectedRow(), newItem);
+                ITEMS.set(this.jTable1.getSelectedRow(), newItem);
                 JOptionPane.showMessageDialog(null, "Update item " + newItem.getName() + " successfully!!");
                 this.loadTable();
             }
         }catch (IllegalArgumentException ex){
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }catch (Exception e){
-            items = ItemDAO.getAllItem();
+            ITEMS = ItemDAO.getAllItem();
             loadTable();
         }
     }
@@ -143,15 +145,15 @@ public class ItemPanel extends javax.swing.JPanel {
     * */
     private void insertNewItem() {
         String code = this.txtCode.getText();
-        if (items.stream().anyMatch(item -> item.getCode().equals(code))){
+        if (ITEMS.stream().anyMatch(item -> item.getCode().equals(code))){
             JOptionPane.showMessageDialog(null, "Item code duplicate!!!");
-        } else {
+        }else {
             try{
                 Item newItem = getItem(code);
-                if(ItemDAO.insertItem(newItem)) if (items.add(newItem))
+                if (ItemDAO.insertItem(newItem)) if (ITEMS.add(newItem))
                     JOptionPane.showMessageDialog(null, "Add item successfully!!");
                 else
-                    items = ItemDAO.getAllItem();
+                    ITEMS = ItemDAO.getAllItem();
                 this.loadTable();
             }catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -161,13 +163,15 @@ public class ItemPanel extends javax.swing.JPanel {
 
     private void deleteItem(ActionEvent actionEvent) {
         int row = this.jTable1.getSelectedRow();
-        if (row >= 0 && row < items.size()){
-            Item deleteItem = items.get(row);
+        if (row >= 0 && row < ITEMS.size()){
+            Item deleteItem = ITEMS.get(row);
             int confirm_delete = JOptionPane.showConfirmDialog(null, "Do you want to delete item " + deleteItem.getName() + "?", "Confirm delete", JOptionPane.YES_NO_CANCEL_OPTION);
-            if(confirm_delete == JOptionPane.YES_OPTION) if (ItemDAO.deleteItem(deleteItem)) if (items.remove(deleteItem))
-                JOptionPane.showMessageDialog(null, "Delete Item successfully");
-            else
-                items = ItemDAO.getAllItem();
+            if(confirm_delete == JOptionPane.YES_OPTION) {
+                if (ItemDAO.deleteItem(deleteItem)) if (ITEMS.remove(deleteItem))
+                    JOptionPane.showMessageDialog(null, "Delete item successfully");
+                else
+                    ITEMS = ItemDAO.getAllItem();
+            }
             this.loadTable();
         }
     }
@@ -339,7 +343,7 @@ public class ItemPanel extends javax.swing.JPanel {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(()-> {
-            Frame item = new Frame("item");
+            Frame item = new Frame("Item");
             item.add(new ItemPanel());
             item.setVisible(true);
         });
