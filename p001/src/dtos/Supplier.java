@@ -12,7 +12,7 @@ public class Supplier {
 		this.code = "";
 		this.name = "";
 		this.address = "";
-		this.collaborating = false;
+		this.collaborating = true;
 	}
 
 

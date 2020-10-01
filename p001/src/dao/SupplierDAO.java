@@ -28,7 +28,7 @@ public class SupplierDAO {
 				}
 			} catch (SQLException | IllegalArgumentException e) {
 				e.printStackTrace();
-			}finally {
+			} finally {
 				try{
 					connection.close();
 				} catch (SQLException e) {
@@ -38,6 +38,7 @@ public class SupplierDAO {
 		}
 		return suppliers;
 	}
+
 	public static boolean updateSupplier(Supplier supplier){
 		String sql = "update tblSuppliers\n" +
 				"set supAddress = ?, supName = ?, collaborating = ?\n" +
@@ -49,6 +50,7 @@ public class SupplierDAO {
 		}
 		return false;
 	}
+
 	public static boolean insertSupplier(Supplier supplier){
 		if(supplier == null) return false;
 		String sql = "insert into tblSuppliers (supCode, supName, supAddress, collaborating)\n" +
@@ -56,10 +58,11 @@ public class SupplierDAO {
 		try{
 			return executeNonQuery(sql, supplier.getCode(), supplier.getName(), supplier.getAddress(), supplier.isCollaborating());
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Add supplier "+ supplier.getCode() +"failed!!");
+			JOptionPane.showMessageDialog(null, "Add supplier "+ supplier.getName() +"failed!!");
 		}
 		return false;
 	}
+
 	public static boolean deleteSupplier(Supplier supplier){
 		String sql = "delete from dbo.tblSuppliers\n" +
 				"where supCode = ?";

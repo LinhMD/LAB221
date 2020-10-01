@@ -8,6 +8,15 @@ public class Item {
 	private boolean supplying;
 	private Supplier supplier;
 
+	public Item(){
+		this.code = "";
+		this.name = "";
+		this.unit = "";
+		this.supplier = new Supplier();
+		this.price = 0;
+		this.supplying = true;
+	}
+
 	public Item(String code, String name, String unit, double price, boolean supplying, Supplier supplier) throws IllegalArgumentException {
 		StringBuilder error = new StringBuilder();
 		//check null

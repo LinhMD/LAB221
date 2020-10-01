@@ -16,6 +16,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
+import java.util.stream.Collectors;
+
+import static gui.SupplierPanel.*;
 
 /**
  *
@@ -50,7 +53,7 @@ public class ItemPanel extends javax.swing.JPanel {
         identifiers.add("Supplying");
         model.setColumnIdentifiers(identifiers);
         //Add data to model
-        for (Item item : ITEMS) {
+        ITEMS.forEach(item -> {
             Vector<Object> row = new Vector<>();
             row.add(item.getCode());
             row.add(item.getName());
@@ -59,7 +62,7 @@ public class ItemPanel extends javax.swing.JPanel {
             row.add(item.getPrice());
             row.add(item.isSupplying());
             model.addRow(row);
-        }
+        });
         this.jTable1.setModel(model);
         this.newClick(null);
     }
@@ -68,34 +71,37 @@ public class ItemPanel extends javax.swing.JPanel {
     * also update cbxSupplier
     * */
     private void tableClick(){
-        //get item selected from table
+        //get item selected from table then display it
         int pos = jTable1.getSelectedRow();
         this.isForNew = false;
         if(pos >= 0 && pos < ITEMS.size()){
             Item item = ITEMS.get(pos);
-            this.txtCode.setText(item.getCode());
             this.txtCode.setEnabled(false);
-            this.txtName.setText(item.getName());
-            this.txtUnit.setText(item.getUnit());
-            this.txtPrice.setText(item.getPrice() +"");
-            this.jRadioButton1.setSelected(item.isSupplying());
-            Vector<Supplier> collabSupplier = updateCbxSupplier();
-            if(collabSupplier.contains(item.getSupplier())){
-                cbxSupplier.setSelectedItem(item.getSupplier());
-            }
+            displayItem(item);
         }
     }
+
+    private void displayItem(Item item) {
+        this.txtCode.setText(item.getCode());
+        this.txtName.setText(item.getName());
+        this.txtUnit.setText(item.getUnit());
+        this.txtPrice.setText(item.getPrice() +"");
+        this.jRadioButton1.setSelected(item.isSupplying());
+        Vector<Supplier> collabSupplier = updateCbxSupplier();
+        if(collabSupplier.contains(item.getSupplier())){
+            cbxSupplier.setSelectedItem(item.getSupplier());
+        }else
+            cbxSupplier.setSelectedItem(null);
+    }
+
     /*
     * update supplier cbox and return the list of collab supplier
     *
     * */
     private Vector<Supplier> updateCbxSupplier() {
-        Vector<Supplier> collabSupplier = new Vector<>();
-        for (Supplier supplier : SupplierPanel.SUPPLIER)
-            if (supplier.isCollaborating())
-                collabSupplier.add(supplier);
-        this.cbxSupplier.setModel(new  DefaultComboBoxModel<>(collabSupplier));
-        return collabSupplier;
+        Vector<Supplier> collabSuppliers = SUPPLIER.stream().filter(Supplier::isCollaborating).collect(Collectors.toCollection(Vector::new));
+        this.cbxSupplier.setModel(new DefaultComboBoxModel<>(collabSuppliers));
+        return collabSuppliers;
     }
 
     /*
@@ -104,11 +110,7 @@ public class ItemPanel extends javax.swing.JPanel {
     private void newClick(ActionEvent actionEvent) {
         this.txtCode.setEnabled(true);
         this.txtCode.requestFocus();
-        this.txtCode.setText("");
-        this.txtName.setText("");
-        this.txtPrice.setText("");
-        this.txtUnit.setText("");
-        this.jRadioButton1.setSelected(true);
+        this.displayItem(new Item());
         this.isForNew = true;
         updateCbxSupplier();
     }
@@ -129,7 +131,7 @@ public class ItemPanel extends javax.swing.JPanel {
             Item newItem = this.getItem(this.txtCode.getText());
             if (ItemDAO.updateItem(newItem)){
                 ITEMS.set(this.jTable1.getSelectedRow(), newItem);
-                JOptionPane.showMessageDialog(null, "Update item " + newItem.getName() + " successfully!!");
+                JOptionPane.showMessageDialog(null, "Update item " + newItem.getName() + " successfully.");
                 this.loadTable();
             }
         }catch (IllegalArgumentException ex){
@@ -144,14 +146,16 @@ public class ItemPanel extends javax.swing.JPanel {
     * in case fuk up, update item list base on DB
     * */
     private void insertNewItem() {
+        //get item code and check dup
         String code = this.txtCode.getText();
         if (ITEMS.stream().anyMatch(item -> item.getCode().equals(code))){
             JOptionPane.showMessageDialog(null, "Item code duplicate!!!");
         }else {
+            //add new item
             try{
                 Item newItem = getItem(code);
                 if (ItemDAO.insertItem(newItem)) if (ITEMS.add(newItem))
-                    JOptionPane.showMessageDialog(null, "Add item successfully!!");
+                    JOptionPane.showMessageDialog(null, "Add item successfully.");
                 else
                     ITEMS = ItemDAO.getAllItem();
                 this.loadTable();
@@ -168,7 +172,7 @@ public class ItemPanel extends javax.swing.JPanel {
             int confirm_delete = JOptionPane.showConfirmDialog(null, "Do you want to delete item " + deleteItem.getName() + "?", "Confirm delete", JOptionPane.YES_NO_CANCEL_OPTION);
             if(confirm_delete == JOptionPane.YES_OPTION) {
                 if (ItemDAO.deleteItem(deleteItem)) if (ITEMS.remove(deleteItem))
-                    JOptionPane.showMessageDialog(null, "Delete item successfully");
+                    JOptionPane.showMessageDialog(null, "Delete item successfully.");
                 else
                     ITEMS = ItemDAO.getAllItem();
             }
@@ -179,7 +183,12 @@ public class ItemPanel extends javax.swing.JPanel {
     private Item getItem(String code) throws IllegalArgumentException{
         String name = this.txtName.getText();
         String unit = this.txtUnit.getText();
-        double price = Double.parseDouble(this.txtPrice.getText());
+        double price;
+        try{
+            price = Double.parseDouble(this.txtPrice.getText());
+        }catch (NumberFormatException e){
+            throw new IllegalArgumentException("Price invalid!!!");
+        }
         boolean supplying = this.jRadioButton1.isSelected();
         Supplier supplier = (Supplier) this.cbxSupplier.getSelectedItem();
         return new Item(code, name, unit, price, supplying, supplier);
