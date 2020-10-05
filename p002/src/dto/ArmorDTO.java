@@ -36,8 +36,11 @@ public class ArmorDTO implements Serializable {
     	this.timeOfCreate = Calendar.getInstance().getTime();
     }
 
-    public ArmorDTO(String armorID){
-	    this.armorID = "";
+    public ArmorDTO(String armorID) throws IllegalArgumentException{
+    	if(armorID != null && armorID.matches(ARMOR_ID_FORMAT))
+	        this.armorID = "";
+    	else
+    		throw new IllegalArgumentException("ArmorID invalid!!!");
 	    this.classification = "";
 	    this.description = "";
 	    this.status = "";
@@ -48,14 +51,13 @@ public class ArmorDTO implements Serializable {
 	public ArmorDTO(String armorID, String classification, String description, String status, Date timeOfCreate, int defence)
 		throws IllegalArgumentException {
 		//check null
-		if(armorID == null || classification == null || description == null || status == null || timeOfCreate == null){
+		if(armorID == null || classification == null || description == null || status == null){
 			StringBuilder err = new StringBuilder();
 			err.append("Armor ");
 			if(armorID == null)             err.append("id, ");
 			if(classification == null)      err.append("classification, ");
 			if(description == null)         err.append("description, ");
 			if(status == null)              err.append("status, ");
-			if(timeOfCreate == null)        err.append("timeOfCreate, ");
 			err.deleteCharAt(err.lastIndexOf(","));
 			err.append("invalid!!!");
 			throw new IllegalArgumentException(err.toString());
@@ -89,7 +91,7 @@ public class ArmorDTO implements Serializable {
 		this.classification = classification;
 		this.description = description;
 		this.status = status;
-		this.timeOfCreate = timeOfCreate;
+		this.timeOfCreate = Objects.requireNonNullElseGet(timeOfCreate, () -> Calendar.getInstance().getTime());
 		this.defence = defence;
 	}
 
