@@ -111,8 +111,8 @@ public class ArmorDTO implements Serializable {
 		return status;
 	}
 
-	public Date getTimeOfCreate() {
-		return timeOfCreate;
+	public String getTimeOfCreate() {
+		return DATE_FORMAT.format(this.timeOfCreate);
 	}
 
 	public int getDefence() {

@@ -35,6 +35,17 @@ public class MainFrame extends javax.swing.JFrame {
         table.setModel(tableModel);
     }
 
+    private void displayArmor(ArmorDTO armor){
+        if(armor == null) return;
+
+        this.txtID.setText(armor.getArmorID());
+        this.txtClassification.setText(armor.getClassification());
+        this.txtDefence.setText(armor.getDefence() +"");
+        this.txtStatus.setText(armor.getStatus());
+        this.txtDesciption.setText(armor.getDescription());
+        this.txtTimeOfCreate.setText(armor.getTimeOfCreate());
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
