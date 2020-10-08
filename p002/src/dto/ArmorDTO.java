@@ -6,6 +6,7 @@
 package dto;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class ArmorDTO implements Serializable {
 	    this.timeOfCreate = Calendar.getInstance().getTime();
     }
 
-	public ArmorDTO(String armorID, String classification, String description, String status, Date timeOfCreate, int defence)
+	public ArmorDTO(String armorID, String classification, String description, String status, String timeOfCreate, int defence)
 		throws IllegalArgumentException {
 		//check null
 		if(armorID == null || classification == null || description == null || status == null){
@@ -91,7 +92,14 @@ public class ArmorDTO implements Serializable {
 		this.classification = classification;
 		this.description = description;
 		this.status = status;
-		this.timeOfCreate = Objects.requireNonNullElseGet(timeOfCreate, () -> Calendar.getInstance().getTime());
+		if(timeOfCreate.isEmpty())
+			this.timeOfCreate = Calendar.getInstance().getTime();
+		else
+			try{
+				this.timeOfCreate = DATE_FORMAT.parse(timeOfCreate);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Time of create invalid(format: "+DATE_FORMAT.toPattern()+")!!!");
+			}
 		this.defence = defence;
 	}
 
@@ -148,6 +156,17 @@ public class ArmorDTO implements Serializable {
 	public void setTimeOfCreate(Date timeOfCreate) {
     	if(timeOfCreate == null) throw new IllegalArgumentException("Armor time of create invalid!!!");
 		this.timeOfCreate = timeOfCreate;
+	}
+
+	public void setTimeOfCreate(String timeOfCreate) throws IllegalArgumentException{
+		if(timeOfCreate.isEmpty())
+			this.timeOfCreate = Calendar.getInstance().getTime();
+		else
+		    try{
+		    	this.timeOfCreate = DATE_FORMAT.parse(timeOfCreate);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Time of create invalid(format: "+DATE_FORMAT.toPattern()+")!!!");
+			}
 	}
 
 	public void setDefence(int defence) {
