@@ -49,9 +49,10 @@ public class ArmorDTO implements Serializable {
 	    this.timeOfCreate = Calendar.getInstance().getTime();
     }
 
-	public ArmorDTO(String armorID, String classification, String description, String status, String timeOfCreate, int defence)
+	public ArmorDTO(String armorID, String classification, String description, String status, String timeOfCreate, String defence)
 		throws IllegalArgumentException {
 		//check null
+		int defences;
 		if(armorID == null || classification == null || description == null || status == null){
 			StringBuilder err = new StringBuilder();
 			err.append("Armor ");
@@ -75,14 +76,20 @@ public class ArmorDTO implements Serializable {
 			err.append("can not be empty!!!");
 			throw new IllegalArgumentException(err.toString());
 		}
+		try{
+			defences = Integer.parseInt(defence);
+		}catch (IllegalArgumentException e){
+			throw new IllegalArgumentException("Armor defence invalid!!!");
+		}
+
 		//check length, scope, format
-		if(!armorID.matches(ARMOR_ID_FORMAT) || classification.length() > 30 || description.length() > 300 || defence <= 0){
+		if(!armorID.matches(ARMOR_ID_FORMAT) || classification.length() > 30 || description.length() > 300 || defences <= 0){
 			StringBuilder err = new StringBuilder();
 			err.append("Armor ");
 			if(!armorID.matches(ARMOR_ID_FORMAT))   err.append("id(format:a-zA-Z0-9, max:10), ");
 			if(classification.length() > 30)        err.append("classification(max:30), ");
 			if(description.length() > 300)          err.append("description(max:300), ");
-			if(defence <= 0)                        err.append("defence(> 0), ");
+			if(defences <= 0)                        err.append("defence(> 0), ");
 			err.deleteCharAt(err.lastIndexOf(","));
 			err.append("must be corrected!!!");
 			throw new IllegalArgumentException(err.toString());
@@ -100,7 +107,7 @@ public class ArmorDTO implements Serializable {
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Time of create invalid(format: "+DATE_FORMAT.toPattern()+")!!!");
 			}
-		this.defence = defence;
+		this.defence = defences;
 	}
 
 	public String getArmorID() {
