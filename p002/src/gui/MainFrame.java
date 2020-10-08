@@ -11,6 +11,9 @@ import util.ArmorListSingleton;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import static dto.ArmorDTO.*;
@@ -22,6 +25,7 @@ import static dto.ArmorDTO.*;
 public class MainFrame extends javax.swing.JFrame {
 
     private Vector<ArmorDTO> armorList = ArmorListSingleton.getInstance();
+    private boolean isForNew = true;
     /**
      * Creates new form MainFrame
      */
@@ -64,6 +68,42 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
         return null;
+    }
+
+
+    private void updateArmor(ActionEvent event) {
+        ArmorDTO updatedArmor = getArmor();
+        if(updatedArmor == null) return;
+        this.armorList.set(this.table.getSelectedRow(), updatedArmor);
+        //TODO:
+        loadTable();
+        this.displayArmor(new ArmorDTO());
+    }
+
+    private void saveNewArmor() {
+        ArmorDTO armor = getArmor();
+        if(armor == null) return;
+        this.armorList.add(armor);
+        //TODO:
+        loadTable();
+    }
+
+    private void newClick(ActionEvent actionEvent){
+        if(!isForNew){
+            isForNew = true;
+            //display a completely empty armor obj
+            this.displayArmor(new ArmorDTO());
+            this.txtID.setEnabled(true);
+        }else {
+            this.saveNewArmor();
+            isForNew = false;
+        }
+    }
+    private void tableClick() {
+        ArmorDTO armorDTO = this.armorList.get(table.getSelectedRow());
+        this.displayArmor(armorDTO);
+        this.txtID.setEnabled(false);
+        this.isForNew = false;
     }
 
     /**
@@ -125,14 +165,22 @@ public class MainFrame extends javax.swing.JFrame {
         table.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table);
         table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                tableClick();
+            }
+        });
         btnGetAll.setText("Get All");
 
         jLabel4.setText("Defence");
 
         btnCreate.setText("Create");
+        btnCreate.addActionListener(this::newClick);
 
         btnUpdate.setText("Update");
+        btnUpdate.addActionListener(this::updateArmor);
 
         btnDelete.setText("Delete");
 
@@ -149,7 +197,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3.setText("Classification");
 
         jLabel6.setText("Time Of Create");
-
 
         jLabel8.setText("Status");
 
@@ -267,6 +314,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+
 
 
     /**
