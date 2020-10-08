@@ -25,10 +25,10 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        loadTable(null);
+        loadTable();
     }
 
-    private void loadTable(ActionEvent event) {
+    private void loadTable() {
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.setColumnIdentifiers(getHeaderInfo());
         ArmorListSingleton.getInstance().forEach((a) -> tableModel.addRow(a.toVector()));
