@@ -81,7 +81,7 @@ public class ArmorDTO implements Serializable {
 			if(!armorID.matches(ARMOR_ID_FORMAT))   err.append("id(format:a-zA-Z0-9, max:10), ");
 			if(classification.length() > 30)        err.append("classification(max:30), ");
 			if(description.length() > 300)          err.append("description(max:300), ");
-			if(defence <= 0)                        err.append("defence must be more than 0, ");
+			if(defence <= 0)                        err.append("defence(> 0), ");
 			err.deleteCharAt(err.lastIndexOf(","));
 			err.append("must be corrected!!!");
 			throw new IllegalArgumentException(err.toString());
