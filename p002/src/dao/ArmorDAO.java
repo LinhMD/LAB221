@@ -3,7 +3,6 @@ package dao;
 import util.ArmorListSingleton;
 
 import java.io.*;
-import java.util.Objects;
 
 public class ArmorDAO {
 	public static final String FILE_NAME = "ArmorData.txt";

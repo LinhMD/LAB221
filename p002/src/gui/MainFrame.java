@@ -5,6 +5,7 @@
  */
 package gui;
 
+import dao.ArmorDAO;
 import dto.ArmorDTO;
 import util.ArmorListSingleton;
 
@@ -70,7 +71,6 @@ public class MainFrame extends javax.swing.JFrame {
         return null;
     }
 
-
     private void updateArmor(ActionEvent event) {
         ArmorDTO updatedArmor = getArmor();
         if(updatedArmor == null) return;
@@ -78,6 +78,7 @@ public class MainFrame extends javax.swing.JFrame {
         //TODO:
         loadTable();
         this.displayArmor(new ArmorDTO());
+        ArmorDAO.writeFile();
     }
 
     private void saveNewArmor() {
@@ -96,14 +97,21 @@ public class MainFrame extends javax.swing.JFrame {
             this.txtID.setEnabled(true);
         }else {
             this.saveNewArmor();
+            ArmorDAO.writeFile();
             isForNew = false;
         }
     }
+
     private void tableClick() {
         ArmorDTO armorDTO = this.armorList.get(table.getSelectedRow());
         this.displayArmor(armorDTO);
         this.txtID.setEnabled(false);
         this.isForNew = false;
+    }
+
+    private void getAllClick(ActionEvent actionEvent) {
+        this.armorList = ArmorListSingleton.getInstance();
+        loadTable();
     }
 
     /**
@@ -173,6 +181,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         btnGetAll.setText("Get All");
+        btnGetAll.addActionListener(this::getAllClick);
 
         jLabel4.setText("Defence");
 
@@ -314,7 +323,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
 
 
 
