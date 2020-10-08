@@ -7,6 +7,7 @@ package util;
 
 import dto.ArmorDTO;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
 /**
@@ -14,9 +15,9 @@ import java.util.List;
  * @author USER
  */
 public interface ArmorInterface extends Remote{
-    boolean createArmor(ArmorDTO armorDTO);
-    ArmorDTO findByArmorID(String id);
-    List<ArmorDTO> findAllArmor();
-    boolean removeArmor(String id);
-    boolean updateArmor(ArmorDTO armorDTO);
+    boolean createArmor(ArmorDTO armorDTO) throws RemoteException;
+    ArmorDTO findByArmorID(String id) throws RemoteException;
+    List<ArmorDTO> findAllArmor() throws RemoteException;
+    boolean removeArmor(String id) throws RemoteException;
+    boolean updateArmor(ArmorDTO armorDTO) throws RemoteException;
 }
