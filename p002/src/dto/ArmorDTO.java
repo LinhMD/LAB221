@@ -159,7 +159,8 @@ public class ArmorDTO implements Serializable {
 	 * return meta data for table header
 	 * */
 	public static Vector<String> getHeaderInfo(){
-		String [] headerInfo = new String[]{"ArmorID", "Classification", "Description", "Status", "Time Of Create", "Defence"};
+//		String [] headerInfo = new String[]{"ArmorID", "Classification", "Description", "Status", "Time Of Create", "Defence"};
+		String [] headerInfo = new String[]{"ArmorID", "Classification", "Time Of Create", "Defence"};
 		return new Vector<>(Arrays.asList(headerInfo));
 	}
 
@@ -167,8 +168,8 @@ public class ArmorDTO implements Serializable {
 		Vector<Object> vector = new Vector<>();
 		vector.add(this.armorID);
 		vector.add(this.classification);
-		vector.add(this.description);
-		vector.add(this.status);
+//		vector.add(this.description);
+//		vector.add(this.status);
 		vector.add(DATE_FORMAT.format(this.timeOfCreate));
 		vector.add(this.defence);
 		return vector;
