@@ -8,9 +8,10 @@ package gui;
 import dto.ArmorDTO;
 import util.ArmorListSingleton;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import java.awt.event.ActionEvent;
+import java.util.Vector;
 
 import static dto.ArmorDTO.*;
 
@@ -20,6 +21,7 @@ import static dto.ArmorDTO.*;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    private Vector<ArmorDTO> armorList = ArmorListSingleton.getInstance();
     /**
      * Creates new form MainFrame
      */
@@ -28,10 +30,13 @@ public class MainFrame extends javax.swing.JFrame {
         loadTable();
     }
 
+    /*
+    * reset table display
+    * */
     private void loadTable() {
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.setColumnIdentifiers(getHeaderInfo());
-        ArmorListSingleton.getInstance().forEach((a) -> tableModel.addRow(a.toVector()));
+        armorList.forEach((a) -> tableModel.addRow(a.toVector()));
         table.setModel(tableModel);
     }
 
@@ -42,8 +47,23 @@ public class MainFrame extends javax.swing.JFrame {
         this.txtClassification.setText(armor.getClassification());
         this.txtDefence.setText(armor.getDefence() +"");
         this.txtStatus.setText(armor.getStatus());
-        this.txtDesciption.setText(armor.getDescription());
+        this.txtDescription.setText(armor.getDescription());
         this.txtTimeOfCreate.setText(armor.getTimeOfCreate());
+    }
+
+    private ArmorDTO getArmor(){
+        try{
+            String id = this.txtID.getText();
+            String classification = this.txtClassification.getText();
+            String description = this.txtDescription.getText();
+            String timeOfCreate = this.txtTimeOfCreate.getText();
+            String status = this.txtStatus.getText();
+            String defence = this.txtDefence.getText();
+            return new ArmorDTO(id, classification, description, status, timeOfCreate, defence);
+        }catch (IllegalArgumentException e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -68,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnFindArmorByID = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        txtDesciption = new javax.swing.JTextArea();
+        txtDescription = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         txtID = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -120,9 +140,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel5.setText("Description");
 
-        txtDesciption.setColumns(20);
-        txtDesciption.setRows(5);
-        jScrollPane2.setViewportView(txtDesciption);
+        txtDescription.setColumns(20);
+        txtDescription.setRows(5);
+        jScrollPane2.setViewportView(txtDescription);
 
         jLabel2.setText("ArmorID");
 
@@ -303,7 +323,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable table;
     private javax.swing.JTextField txtClassification;
     private javax.swing.JTextField txtDefence;
-    private javax.swing.JTextArea txtDesciption;
+    private javax.swing.JTextArea txtDescription;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtStatus;
     private javax.swing.JTextField txtTimeOfCreate;
