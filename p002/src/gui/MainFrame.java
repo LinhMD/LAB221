@@ -34,9 +34,9 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame(ArmorInterface armorI) {
-        initComponents();
+        this.initComponents();
         this.armorI = armorI;
-        loadTable();
+        this.loadTable();
 //        try {
 //            this.armorI = armorI;
 //            armorList = (Vector<ArmorDTO>) this.armorI.findAllArmor();
@@ -51,8 +51,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void loadTable() {
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.setColumnIdentifiers(getHeaderInfo());
-        armorList.forEach((a) -> tableModel.addRow(a.toVector()));
-        table.setModel(tableModel);
+        this.armorList.forEach((a) -> tableModel.addRow(a.toVector()));
+        this.table.setModel(tableModel);
     }
 
     private void displayArmor(ArmorDTO armor){
@@ -87,7 +87,7 @@ public class MainFrame extends javax.swing.JFrame {
         int option = JOptionPane.showConfirmDialog(null, "Do you want to delete armor " + id + "?");
         if(option == JOptionPane.YES_OPTION){
             try{
-                if(armorI.removeArmor(id)){
+                if(this.armorI.removeArmor(id)){
                     this.armorList.remove(new ArmorDTO(id));
                     JOptionPane.showMessageDialog(null, "Delete armor " + id + " successfully!");
                     loadTable();
@@ -100,14 +100,14 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void updateArmor(ActionEvent event) {
-        ArmorDTO updatedArmor = getArmor();
+        ArmorDTO updatedArmor = this.getArmor();
         if(updatedArmor == null) return;
 
         try{
-            if(armorI.updateArmor(updatedArmor)){
+            if(this.armorI.updateArmor(updatedArmor)){
                 this.armorList.set(this.table.getSelectedRow(), updatedArmor);
                 JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " successfully!");
-                loadTable();
+                this.loadTable();
             } else
                 JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " failed!!!");
         } catch (RemoteException e) {
@@ -116,14 +116,14 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void saveNewArmor() {
-        ArmorDTO armor = getArmor();
+        ArmorDTO armor = this.getArmor();
         if(armor == null) return;
 
         try{
-            if(armorI.createArmor(armor)){
+            if(this.armorI.createArmor(armor)){
                 this.armorList.add(armor);
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " successfully!");
-                loadTable();
+                this.loadTable();
             } else
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " failed!!!");
         }catch (Exception ex){
@@ -132,14 +132,14 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void newClick(ActionEvent actionEvent){
-        if(!isForNew){
-            isForNew = true;
+        if(!this.isForNew){
+            this.isForNew = true;
             //display a completely empty armor obj
             this.displayArmor(new ArmorDTO());
             this.txtID.setEnabled(true);
         }else {
             this.saveNewArmor();
-            isForNew = false;
+            this.isForNew = false;
         }
     }
 
@@ -151,11 +151,11 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void getAllClick(ActionEvent actionEvent) {
         try {
-            this.armorList = (Vector<ArmorDTO>) armorI.findAllArmor();
+            this.armorList = (Vector<ArmorDTO>) this.armorI.findAllArmor();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        loadTable();
+        this.loadTable();
     }
 
     private void findArmor(ActionEvent actionEvent) {
@@ -163,8 +163,9 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             ArmorDTO armor = armorI.findByArmorID(armorID);
             if(!this.armorList.contains(armor))
-                armorList.add(armor);
+                this.armorList.add(armor);
             this.displayArmor(armor);
+
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }

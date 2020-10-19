@@ -6,8 +6,14 @@
 package gui;
 
 
+import util.ArmorInterface;
+
 import javax.swing.*;
 import java.awt.*;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 /**
  *
@@ -109,7 +115,19 @@ public class LoginFrame extends javax.swing.JFrame {
         for (char c : password) {
             pass.append(c);
         }
-        throw new RuntimeException("implement this");
+        String id = this.txtID.getText();
+        if(id.equals("linh") && pass.toString().equals("123456")){
+            EventQueue.invokeLater(()->{
+                try {
+                    MainFrame mainFrame = new MainFrame((ArmorInterface) Naming.lookup("rmi://127.0.0.1:1097/remoteArmor"));
+                    mainFrame.setVisible(true);
+                    mainFrame.setLocationRelativeTo(null);
+                } catch (NotBoundException | RemoteException | MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            });
+            this.dispose();
+        }
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
