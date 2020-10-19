@@ -9,6 +9,7 @@ import java.util.Vector;
 public class ArmorListSingleton extends Vector<ArmorDTO> implements Serializable {
 	private static ArmorListSingleton ARMOR_LIST = null;
 
+
 	public static ArmorListSingleton getInstance(){
 		System.out.println(ARMOR_LIST);
 		if(ARMOR_LIST != null){

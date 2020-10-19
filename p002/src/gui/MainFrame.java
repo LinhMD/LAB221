@@ -5,19 +5,21 @@
  */
 package gui;
 
-import dao.ArmorDAO;
 import dto.ArmorDTO;
-import util.ArmorListSingleton;
+import util.ArmorInterface;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.Vector;
 
-import static dto.ArmorDTO.*;
+import static dto.ArmorDTO.getHeaderInfo;
 
 /**
  *
@@ -25,14 +27,22 @@ import static dto.ArmorDTO.*;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private Vector<ArmorDTO> armorList = ArmorListSingleton.getInstance();
+    private Vector<ArmorDTO> armorList = new Vector<>();
     private boolean isForNew = true;
+    ArmorInterface armorI;
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {
+    public MainFrame(ArmorInterface armorI) {
         initComponents();
+        this.armorI = armorI;
         loadTable();
+//        try {
+//            this.armorI = armorI;
+//            armorList = (Vector<ArmorDTO>) this.armorI.findAllArmor();
+//        } catch ( RemoteException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /*
@@ -72,31 +82,53 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void deleteArmor(ActionEvent actionEvent){
-        ArmorDTO armorDTO = this.armorList.get(this.table.getSelectedRow());
-        if(armorDTO == null) return;
-        int option = JOptionPane.showConfirmDialog(null, "Do you want to delete armor " + armorDTO.getArmorID() + "?");
+        String id = this.txtID.getText();
+
+        int option = JOptionPane.showConfirmDialog(null, "Do you want to delete armor " + id + "?");
         if(option == JOptionPane.YES_OPTION){
-            this.armorList.remove(armorDTO);
-            loadTable();
+            try{
+                if(armorI.removeArmor(id)){
+                    this.armorList.remove(new ArmorDTO(id));
+                    JOptionPane.showMessageDialog(null, "Delete armor " + id + " successfully!");
+                    loadTable();
+                } else
+                    JOptionPane.showMessageDialog(null, "Delete armor " + id + " failed!!!");
+            }catch (Exception ex){
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
         }
     }
 
     private void updateArmor(ActionEvent event) {
         ArmorDTO updatedArmor = getArmor();
         if(updatedArmor == null) return;
-        this.armorList.set(this.table.getSelectedRow(), updatedArmor);
-        //TODO:
-        loadTable();
-        this.displayArmor(new ArmorDTO());
-        ArmorDAO.writeFile();
+
+        try{
+            if(armorI.updateArmor(updatedArmor)){
+                this.armorList.set(this.table.getSelectedRow(), updatedArmor);
+                JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " successfully!");
+                loadTable();
+            } else
+                JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " failed!!!");
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
 
     private void saveNewArmor() {
         ArmorDTO armor = getArmor();
         if(armor == null) return;
-        this.armorList.add(armor);
-        //TODO:
-        loadTable();
+
+        try{
+            if(armorI.createArmor(armor)){
+                this.armorList.add(armor);
+                JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " successfully!");
+                loadTable();
+            } else
+                JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " failed!!!");
+        }catch (Exception ex){
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
     }
 
     private void newClick(ActionEvent actionEvent){
@@ -107,7 +139,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.txtID.setEnabled(true);
         }else {
             this.saveNewArmor();
-            ArmorDAO.writeFile();
             isForNew = false;
         }
     }
@@ -115,13 +146,28 @@ public class MainFrame extends javax.swing.JFrame {
     private void tableClick() {
         ArmorDTO armorDTO = this.armorList.get(table.getSelectedRow());
         this.displayArmor(armorDTO);
-        this.txtID.setEnabled(false);
         this.isForNew = false;
     }
 
     private void getAllClick(ActionEvent actionEvent) {
-        this.armorList = ArmorListSingleton.getInstance();
+        try {
+            this.armorList = (Vector<ArmorDTO>) armorI.findAllArmor();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         loadTable();
+    }
+
+    private void findArmor(ActionEvent actionEvent) {
+        String armorID = this.txtID.getText();
+        try {
+            ArmorDTO armor = armorI.findByArmorID(armorID);
+            if(!this.armorList.contains(armor))
+                armorList.add(armor);
+            this.displayArmor(armor);
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
 
     /**
@@ -205,7 +251,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnDelete.addActionListener(this::deleteArmor);
 
         btnFindArmorByID.setText("Find Armor by ID");
-
+        btnFindArmorByID.addActionListener(this::findArmor);
         jLabel5.setText("Description");
 
         txtDescription.setColumns(20);
@@ -337,6 +383,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 
 
+
     /**
      * @param args the command line arguments
      */
@@ -348,9 +395,11 @@ public class MainFrame extends javax.swing.JFrame {
             e.printStackTrace();
         }
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                new MainFrame((ArmorInterface) Naming.lookup("rmi://127.0.0.1:1097/remoteArmor")).setVisible(true);
+            } catch (NotBoundException | RemoteException | MalformedURLException e) {
+                e.printStackTrace();
             }
         });
     }

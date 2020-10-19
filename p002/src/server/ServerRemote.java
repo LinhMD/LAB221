@@ -1,7 +1,9 @@
 package server;
 
+import dao.ArmorDAO;
 import dto.ArmorDTO;
 import util.ArmorInterface;
+import util.ArmorListSingleton;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -17,35 +19,70 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 
 	@Override
 	public boolean createArmor(ArmorDTO armorDTO) throws RemoteException {
-		return false;
+		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
+		if(!armorDTOS.contains(armorDTO)){
+			boolean add = armorDTOS.add(armorDTO);
+			save();
+			return add;
+		} else
+			throw new RemoteException("ArmorID duplicate!!!");
+
 	}
 
 	@Override
 	public ArmorDTO findByArmorID(String id) throws RemoteException {
-		return null;
+		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
+		try{
+			return armorDTOS.get(armorDTOS.indexOf(new ArmorDTO(id)));
+		}catch (ArrayIndexOutOfBoundsException ex){
+			throw new RemoteException("Can not find armorID!!!");
+		}
 	}
 
 	@Override
 	public List<ArmorDTO> findAllArmor() throws RemoteException {
-		return null;
+		try{
+			return ArmorListSingleton.getInstance();
+		}catch (Exception ex){
+			throw new RemoteException(ex.getMessage());
+		}
 	}
 
 	@Override
 	public boolean removeArmor(String id) throws RemoteException {
-		return false;
+		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
+		try{
+			return armorDTOS.remove(new ArmorDTO(id));
+		}catch (Exception ex){
+			throw new RemoteException(ex.getMessage());
+		}finally {
+			save();
+		}
 	}
 
 	@Override
 	public boolean updateArmor(ArmorDTO armorDTO) throws RemoteException {
-		return false;
+		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
+		try{
+			findByArmorID(armorDTO.getArmorID());
+			return armorDTOS.set(armorDTOS.indexOf(armorDTO), armorDTO) != null;
+		}catch (Exception ex){
+			throw new RemoteException(ex.getMessage());
+		}finally {
+			save();
+		}
+	}
+
+	private void save(){
+		ArmorDAO.writeFile();
 	}
 
 	public static void main(String[] args) {
 		try {
 			ArmorInterface serverRemote = new ServerRemote();
 			LocateRegistry.createRegistry(1097);
-			Naming.rebind("RemoteArmor", serverRemote);
-			System.out.println("Server is running....");
+			Naming.rebind("rmi://127.0.0.1:1097/remoteArmor", serverRemote);
+
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
