@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Objects;
 
 public class ServerRemote extends UnicastRemoteObject implements ArmorInterface {
 	protected ServerRemote() throws RemoteException {
@@ -33,9 +34,10 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 	public ArmorDTO findByArmorID(String id) throws RemoteException {
 		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
 		try{
+			System.out.println(armorDTOS.indexOf(new ArmorDTO(id)));
 			return armorDTOS.get(armorDTOS.indexOf(new ArmorDTO(id)));
 		}catch (ArrayIndexOutOfBoundsException ex){
-			throw new RemoteException("Can not find armorID!!!");
+			throw new RemoteException("Can not find armor "+ id +"!!!");
 		}
 	}
 
@@ -52,7 +54,10 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 	public boolean removeArmor(String id) throws RemoteException {
 		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
 		try{
+			findByArmorID(id);
 			return armorDTOS.remove(new ArmorDTO(id));
+		}catch (RemoteException ex){
+			throw ex;
 		}catch (Exception ex){
 			throw new RemoteException(ex.getMessage());
 		}finally {
@@ -66,6 +71,8 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 		try{
 			findByArmorID(armorDTO.getArmorID());
 			return armorDTOS.set(armorDTOS.indexOf(armorDTO), armorDTO) != null;
+		}catch (RemoteException ex){
+			throw ex;
 		}catch (Exception ex){
 			throw new RemoteException(ex.getMessage());
 		}finally {

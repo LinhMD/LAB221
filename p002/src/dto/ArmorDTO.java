@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class ArmorDTO implements Serializable {
 	public static final String ARMOR_ID_FORMAT = "^[a-zA-Z0-9]{1,10}$";
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	static {
 		DATE_FORMAT.setLenient(false);
 	}
@@ -39,7 +39,7 @@ public class ArmorDTO implements Serializable {
 
     public ArmorDTO(String armorID) throws IllegalArgumentException{
     	if(armorID != null && armorID.matches(ARMOR_ID_FORMAT))
-	        this.armorID = "";
+	        this.armorID = armorID;
     	else
     		throw new IllegalArgumentException("ArmorID invalid!!!");
 	    this.classification = "";
@@ -142,21 +142,21 @@ public class ArmorDTO implements Serializable {
 
 	public void setClassification(String classification) {
     	if(classification == null) throw new IllegalArgumentException("Armor classification invalid!!!");
-    	if(classification.isBlank()) throw new IllegalArgumentException("Armor classification can not be empty.");
-    	if(classification.length() > 30) throw new IllegalArgumentException("Armor classification length must lower than 30.");
+    	if(classification.isBlank()) throw new IllegalArgumentException("Armor classification can not be empty!!!");
+    	if(classification.length() > 30) throw new IllegalArgumentException("Armor classification length must lower than 30!!!");
 		this.classification = classification;
 	}
 
 	public void setDescription(String description) {
 		if(description == null) throw new IllegalArgumentException("Armor description invalid!!!");
-		if(description.isBlank()) throw new IllegalArgumentException("Armor description can not be empty.");
-		if(description.length() > 300) throw new IllegalArgumentException("Armor description length must lower than 300.");
+		if(description.isBlank()) throw new IllegalArgumentException("Armor description can not be empty!!!");
+		if(description.length() > 300) throw new IllegalArgumentException("Armor description length must lower than 300!!!");
 		this.description = description;
 	}
 
 	public void setStatus(String status) {
 		if(status == null) throw new IllegalArgumentException("Armor status invalid!!!");
-		if(status.isBlank()) throw new IllegalArgumentException("Armor status can not be empty.");
+		if(status.isBlank()) throw new IllegalArgumentException("Armor status can not be empty!!!");
 		this.status = status;
 	}
 
@@ -177,7 +177,7 @@ public class ArmorDTO implements Serializable {
 	}
 
 	public void setDefence(int defence) {
-		if(defence <= 0) throw new IllegalArgumentException("Armor defence must bigger than 0.");
+		if(defence <= 0) throw new IllegalArgumentException("Armor defence must bigger than 0!!!");
     	this.defence = defence;
 	}
 

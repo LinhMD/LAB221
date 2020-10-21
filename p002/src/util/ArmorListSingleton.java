@@ -11,10 +11,17 @@ public class ArmorListSingleton extends Vector<ArmorDTO> implements Serializable
 
 
 	public static ArmorListSingleton getInstance(){
-		System.out.println(ARMOR_LIST);
 		if(ARMOR_LIST != null){
 			return ARMOR_LIST;
 		} else
 			return ARMOR_LIST = ArmorDAO.readFile();
+	}
+
+	public static void main(String[] args) {
+		ArmorListSingleton instance = getInstance();
+		instance.add(new ArmorDTO("1", "as", "as", "As","", "2"));
+		System.out.println(instance);
+		System.out.println(instance.indexOf(new ArmorDTO("1")));
+
 	}
 }

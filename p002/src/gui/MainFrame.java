@@ -34,6 +34,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame(ArmorInterface armorI) {
+        this.setTitle("Client frame");
         this.initComponents();
         this.armorI = armorI;
         this.loadTable();
@@ -90,11 +91,13 @@ public class MainFrame extends javax.swing.JFrame {
                 if(this.armorI.removeArmor(id)){
                     this.armorList.remove(new ArmorDTO(id));
                     JOptionPane.showMessageDialog(null, "Delete armor " + id + " successfully!");
-                    loadTable();
+                    this.loadTable();
+                    this.displayArmor(new ArmorDTO());
                 } else
                     JOptionPane.showMessageDialog(null, "Delete armor " + id + " failed!!!");
             }catch (Exception ex){
-                JOptionPane.showMessageDialog(null, ex.getMessage());
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
             }
         }
     }
@@ -105,13 +108,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         try{
             if(this.armorI.updateArmor(updatedArmor)){
-                this.armorList.set(this.table.getSelectedRow(), updatedArmor);
+                this.armorList.set(armorList.indexOf(updatedArmor), updatedArmor);
                 JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " successfully!");
                 this.loadTable();
             } else
                 JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " failed!!!");
         } catch (RemoteException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
 
@@ -126,8 +130,9 @@ public class MainFrame extends javax.swing.JFrame {
                 this.loadTable();
             } else
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " failed!!!");
-        }catch (Exception ex){
-            JOptionPane.showMessageDialog(null, ex.getMessage());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
 
@@ -153,6 +158,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             this.armorList = (Vector<ArmorDTO>) this.armorI.findAllArmor();
         } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(null, e.getCause().getMessage());
             e.printStackTrace();
         }
         this.loadTable();
@@ -165,9 +171,11 @@ public class MainFrame extends javax.swing.JFrame {
             if(!this.armorList.contains(armor))
                 this.armorList.add(armor);
             this.displayArmor(armor);
-
+            this.loadTable();
+            this.isForNew = false;
         } catch (RemoteException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
 
@@ -237,6 +245,7 @@ public class MainFrame extends javax.swing.JFrame {
                 tableClick();
             }
         });
+
         btnGetAll.setText("Get All");
         btnGetAll.addActionListener(this::getAllClick);
 
@@ -253,6 +262,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         btnFindArmorByID.setText("Find Armor by ID");
         btnFindArmorByID.addActionListener(this::findArmor);
+
         jLabel5.setText("Description");
 
         txtDescription.setColumns(20);
