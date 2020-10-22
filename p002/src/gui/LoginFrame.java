@@ -127,7 +127,8 @@ public class LoginFrame extends javax.swing.JFrame {
                 }
             });
             this.dispose();
-        }
+        }else
+            JOptionPane.showMessageDialog(null, "Login failed!!!");
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

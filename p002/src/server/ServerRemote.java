@@ -10,7 +10,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.Objects;
 
 public class ServerRemote extends UnicastRemoteObject implements ArmorInterface {
 	protected ServerRemote() throws RemoteException {
@@ -34,7 +33,6 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 	public ArmorDTO findByArmorID(String id) throws RemoteException {
 		ArmorListSingleton armorDTOS = ArmorListSingleton.getInstance();
 		try{
-			System.out.println(armorDTOS.indexOf(new ArmorDTO(id)));
 			return armorDTOS.get(armorDTOS.indexOf(new ArmorDTO(id)));
 		}catch (ArrayIndexOutOfBoundsException ex){
 			throw new RemoteException("Can not find armor "+ id +"!!!");

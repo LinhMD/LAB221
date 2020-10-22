@@ -11,9 +11,9 @@ public class ArmorListSingleton extends Vector<ArmorDTO> implements Serializable
 
 
 	public static ArmorListSingleton getInstance(){
-		if(ARMOR_LIST != null){
+		if(ARMOR_LIST != null)
 			return ARMOR_LIST;
-		} else
+		else
 			return ARMOR_LIST = ArmorDAO.readFile();
 	}
 

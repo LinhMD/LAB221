@@ -103,6 +103,11 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void updateArmor(ActionEvent event) {
+        if(isForNew){
+            JOptionPane.showMessageDialog(null, "Invalid action!!!");
+            return;
+        }
+
         ArmorDTO updatedArmor = this.getArmor();
         if(updatedArmor == null) return;
 
@@ -119,6 +124,11 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    private void changeState(boolean stateOfNew){
+        this.isForNew = stateOfNew;
+        this.txtID.setEnabled(stateOfNew);
+    }
+
     private void saveNewArmor() {
         ArmorDTO armor = this.getArmor();
         if(armor == null) return;
@@ -128,6 +138,7 @@ public class MainFrame extends javax.swing.JFrame {
                 this.armorList.add(armor);
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " successfully!");
                 this.loadTable();
+                this.changeState(false);
             } else
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " failed!!!");
         } catch (RemoteException e) {
@@ -138,20 +149,18 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void newClick(ActionEvent actionEvent){
         if(!this.isForNew){
-            this.isForNew = true;
+            this.changeState(true);
             //display a completely empty armor obj
             this.displayArmor(new ArmorDTO());
-            this.txtID.setEnabled(true);
         }else {
             this.saveNewArmor();
-            this.isForNew = false;
         }
     }
 
     private void tableClick() {
         ArmorDTO armorDTO = this.armorList.get(table.getSelectedRow());
         this.displayArmor(armorDTO);
-        this.isForNew = false;
+        this.changeState(false);
     }
 
     private void getAllClick(ActionEvent actionEvent) {
@@ -254,7 +263,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnCreate.setText("Create");
         btnCreate.addActionListener(this::newClick);
 
-        btnUpdate.setText("Update");
+        btnUpdate.setText("Save");
         btnUpdate.addActionListener(this::updateArmor);
 
         btnDelete.setText("Delete");
@@ -408,7 +417,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                new MainFrame((ArmorInterface) Naming.lookup("rmi://127.0.0.1:1097/remoteArmor")).setVisible(true);
+                MainFrame mainFrame = new MainFrame((ArmorInterface) Naming.lookup("rmi://127.0.0.1:1097/remoteArmor"));
+                mainFrame.setVisible(true);
+                mainFrame.setLocationRelativeTo(null);
             } catch (NotBoundException | RemoteException | MalformedURLException e) {
                 e.printStackTrace();
             }
