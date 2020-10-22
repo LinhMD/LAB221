@@ -263,7 +263,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnCreate.setText("Create");
         btnCreate.addActionListener(this::newClick);
 
-        btnUpdate.setText("Save");
+        btnUpdate.setText("Update");
         btnUpdate.addActionListener(this::updateArmor);
 
         btnDelete.setText("Delete");
