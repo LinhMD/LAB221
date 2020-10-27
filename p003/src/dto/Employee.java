@@ -30,7 +30,7 @@ public class Employee {
 	private String phone;
 	private String email;
 	private Date dob;
-
+	private boolean isDelete = false;
 	public Employee(){
 	}
 
@@ -122,6 +122,10 @@ public class Employee {
 		}
 	}
 
+	public void setDelete(boolean delete) {
+		isDelete = delete;
+	}
+
 	public String getEmpID() {
 		return empID;
 	}
@@ -144,6 +148,10 @@ public class Employee {
 
 	public String getDOB(){
 		return DOB_FORMAT.format(this.dob);
+	}
+
+	public boolean isDelete() {
+		return isDelete;
 	}
 
 	/*
