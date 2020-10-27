@@ -84,9 +84,14 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 
 	public static void main(String[] args) {
 		try {
+
+//			ArmorInterface armorInterface = new ServerRemote();
+//			Naming.rebind("rmi://127.0.0.1/remoteArmor", armorInterface);
+
 			ArmorInterface serverRemote = new ServerRemote();
 			LocateRegistry.createRegistry(1097);
 			Naming.rebind("rmi://127.0.0.1:1097/remoteArmor", serverRemote);
+
 
 		} catch (Exception exception) {
 			exception.printStackTrace();
