@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Vector;
 
 public class Employee {
 	public static final String EMP_ID_FORMAT = "^\\w{2,10}$";
@@ -146,6 +147,17 @@ public class Employee {
 
 	public String getDOB(){
 		return DOB_FORMAT.format(this.dob);
+	}
+
+	//use toVector to get Employee information by a vector and then later use it as a row vector of a table
+	public Vector<String> toVector(){
+		Vector<String> vector = new Vector<>(4);
+		vector.add(this.getEmpID());
+		vector.add(this.getFullName());
+		vector.add(this.getPhone());
+		vector.add(this.getEmail());
+
+		return vector;
 	}
 
 	@Override
