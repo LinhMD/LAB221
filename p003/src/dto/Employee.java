@@ -33,6 +33,9 @@ public class Employee {
 	private String email;
 	private Date dob;
 
+	public Employee(){
+	}
+
 	public Employee(String empID) throws IllegalArgumentException {
 		if(empID.matches(EMP_ID_FORMAT))
 			this.empID = empID;
