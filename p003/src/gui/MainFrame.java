@@ -6,20 +6,6 @@
 package gui;
 
 
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.util.Vector;
-
-
-
 /**
  *
  * @author USER
@@ -101,13 +87,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         btnCreate.setText("Create");
 
-
-
         btnSave.setText("Save");
 
-
         btnDelete.setText("Delete");
-
 
         btnFindEmpByID.setText("Find by EmpID");
 
@@ -122,8 +104,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3.setText("Full Name");
 
         jLabel6.setText("Phone");
-
-
 
         jLabel8.setText("DOB");
 
