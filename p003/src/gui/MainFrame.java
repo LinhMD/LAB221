@@ -7,24 +7,26 @@ package gui;
 
 
 import dto.Employee;
-import util.EmpListSingleton;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.util.Vector;
 
 /**
  *
  * @author USER
  */
 public class MainFrame extends javax.swing.JFrame {
-
-   
+    private Vector<Employee> employees = new Vector<>();
+    private boolean isForNew;
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-       initComponents();
-       loadTable();
+       this.initComponents();
+       this.loadTable();
+       this.changeState(true);
     }
 
     /*
@@ -36,7 +38,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void loadTable(){
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(Employee.getHeader());
-        EmpListSingleton.getInstance().stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
+//        EmpListSingleton.getInstance().stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
+        employees.stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
         table.setModel(model);
     }
 
@@ -48,12 +51,13 @@ public class MainFrame extends javax.swing.JFrame {
         int selectedRow = table.getSelectedRow();
         Employee employee = (Employee) table.getModel().getValueAt(selectedRow, 0);
         this.displayEmp(employee);
+        this.changeState(false);
     }
 
     /*
     * from user input in display panel
     * create new Employee
-    * thy committed sins null thy get
+    * sins thy committed null thy shall get(also an display error)
     * */
     private Employee getEmployee(){
         String empID = this.txtEmpID.getText();
@@ -83,6 +87,24 @@ public class MainFrame extends javax.swing.JFrame {
         this.txtEmpPhone.setText(employee.getPhone());
         this.txtEmpEmail.setText(employee.getEmail());
         this.txtEmpDOB.setText(employee.getDOB());
+    }
+
+    /*
+    * change state save for new(true)/update(false)
+    * */
+    private void changeState(boolean state){
+        this.txtEmpID.setEnabled(state);
+        this.isForNew = state;
+    }
+
+    /*
+    * when click new btn
+    * change state to save for new
+    * and clear display panel by throw at it a half-baked Employee
+    * */
+    private void btnNewClick(ActionEvent event){
+        this.changeState(true);
+        this.displayEmp(new Employee());
     }
 
     /**
