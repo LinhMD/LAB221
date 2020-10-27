@@ -6,6 +6,12 @@
 package gui;
 
 
+import dto.Employee;
+import util.EmpListSingleton;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author USER
@@ -17,9 +23,67 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     public MainFrame() {
-       
+       initComponents();
+       loadTable();
     }
 
+    /*
+    * create new table model and set header
+    * get all employee whose isDelete == false
+    * add each employee.toVector as a row to table model
+    * then set table model
+    * */
+    private void loadTable(){
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(Employee.getHeader());
+        EmpListSingleton.getInstance().stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
+        table.setModel(model);
+    }
+
+    /*
+    * get selected employee
+    * then display
+    * */
+    private void tableClick(){
+        int selectedRow = table.getSelectedRow();
+        Employee employee = (Employee) table.getModel().getValueAt(selectedRow, 0);
+        this.displayEmp(employee);
+    }
+
+    /*
+    * from user input in display panel
+    * create new Employee
+    * thy committed sins null thy get
+    * */
+    private Employee getEmployee(){
+        String empID = this.txtEmpID.getText();
+        String fullName = this.txtEmpFullName.getText();
+        String address = this.txtEmpAddress.getText();
+        String phone = this.txtEmpPhone.getText();
+        String email = this.txtEmpEmail.getText();
+        String dob = this.txtEmpDOB.getText();
+        try{
+            return new Employee(empID,fullName,address,phone,email,dob);
+        }catch (IllegalArgumentException ex){
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        return null;
+    }
+    /*
+    * take para as an employee(nullable)
+    * then display it to display panel
+    * */
+    private void displayEmp(Employee employee){
+        //always null checking
+        if(employee == null) return;
+
+        this.txtEmpID.setText(employee.getEmpID());
+        this.txtEmpFullName.setText(employee.getFullName());
+        this.txtEmpAddress.setText(employee.getAddress());
+        this.txtEmpPhone.setText(employee.getPhone());
+        this.txtEmpEmail.setText(employee.getEmail());
+        this.txtEmpDOB.setText(employee.getDOB());
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -225,9 +289,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 
 
-    /**
-     * @param args the command line arguments
-     */
+
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

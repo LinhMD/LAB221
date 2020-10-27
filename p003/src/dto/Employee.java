@@ -1,10 +1,11 @@
 package dto;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Employee {
+public class Employee implements Serializable, Comparable<Employee> {
 	public static final String EMP_ID_FORMAT = "^\\w{2,10}$";
 	/*
 	* ^(?![\s.]+$) check the whole string must not be empty(contain only white space)
@@ -19,7 +20,7 @@ public class Employee {
 	public static final String PHONE_FORMAT = "^\\d{0,15}$";
 	public static final String ADDRESS_FORMAT = "^.{0,300}$";
 	public static final SimpleDateFormat DOB_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-	//also set lenient to false bc no mercy for thy whose commit a sin
+	//also set lenient to false bc no mercy for the sinful in lord's eye
 	static {
 		DOB_FORMAT.setLenient(false);
 	}
@@ -30,8 +31,15 @@ public class Employee {
 	private String phone;
 	private String email;
 	private Date dob;
-	private boolean isDelete = false;
+	private boolean delete = false;
+
 	public Employee(){
+		this.empID = "";
+		this.fullName = "";
+		this.address = "";
+		this.phone = "";
+		this.email = "";
+		this.dob = null;
 	}
 
 	public Employee(String empID) throws IllegalArgumentException {
@@ -123,7 +131,7 @@ public class Employee {
 	}
 
 	public void setDelete(boolean delete) {
-		isDelete = delete;
+		this.delete = delete;
 	}
 
 	public String getEmpID() {
@@ -147,19 +155,19 @@ public class Employee {
 	}
 
 	public String getDOB(){
-		return DOB_FORMAT.format(this.dob);
+		return this.dob == null? "" : DOB_FORMAT.format(this.dob);
 	}
 
 	public boolean isDelete() {
-		return isDelete;
+		return delete;
 	}
 
 	/*
 	* Use toVector to get Employee information by a vector and then later use it as a row vector of a table
 	* */
-	public Vector<String> toVector(){
-		Vector<String> vector = new Vector<>(4);
-		vector.add(this.getEmpID());
+	public Vector<Object> toVector(){
+		Vector<Object> vector = new Vector<>(4);
+		vector.add(this);
 		vector.add(this.getFullName());
 		vector.add(this.getPhone());
 		vector.add(this.getEmail());
@@ -189,14 +197,7 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "Employee{" +
-				"empID='" + empID + '\'' +
-				", fullName='" + fullName + '\'' +
-				", address='" + address + '\'' +
-				", phone='" + phone + '\'' +
-				", email='" + email + '\'' +
-				", dob=" + dob +
-				'}';
+		return this.getEmpID();
 	}
 
 	public static void main(String[] args) {
@@ -210,5 +211,10 @@ public class Employee {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public int compareTo(Employee o) {
+		return this.getEmpID().compareTo(o.getEmpID());
 	}
 }
