@@ -11,12 +11,12 @@ public class Employee implements Serializable, Comparable<Employee> {
 	* ^(?![\s.]+$) check the whole string must not be empty(contain only white space)
 	* [a-zA-Z\s.]{2,30} check string must only contain character and white space
 	* */
-	public static final String FULL_NAME_FORMAT = "^(?![\\s.]+$)[a-zA-Z\\s.]{2,30}$";
+	public static final String FULL_NAME_FORMAT = "^(?![\\s.]+$)[\\w\\s.]{2,30}$";
 	/*
 	* (?=.{1,30}$) check the string length 1-30
 	* [a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+ check email format regardless of length, also must contain a '@'
 	* */
-	public static final String EMAIL_FORMAT = "^(?=.{1,30}$)[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
+	public static final String EMAIL_FORMAT = "^(?=.{1,30}$)[\\w\\d+_.-]+@[\\w\\d.-]+$";
 	public static final String PHONE_FORMAT = "^\\d{0,15}$";
 	public static final String ADDRESS_FORMAT = "^.{0,300}$";
 	public static final SimpleDateFormat DOB_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
@@ -200,6 +200,11 @@ public class Employee implements Serializable, Comparable<Employee> {
 		return this.getEmpID();
 	}
 
+	@Override
+	public int compareTo(Employee o) {
+		return this.getEmpID().compareTo(o.getEmpID());
+	}
+
 	public static void main(String[] args) {
 		System.out.println("SE140063".matches(EMP_ID_FORMAT));
 		System.out.println("        ".matches(FULL_NAME_FORMAT));
@@ -213,8 +218,5 @@ public class Employee implements Serializable, Comparable<Employee> {
 		}
 	}
 
-	@Override
-	public int compareTo(Employee o) {
-		return this.getEmpID().compareTo(o.getEmpID());
-	}
+
 }

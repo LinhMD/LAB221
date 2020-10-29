@@ -11,6 +11,8 @@ import dto.Employee;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 /**
@@ -107,6 +109,20 @@ public class MainFrame extends javax.swing.JFrame {
         this.displayEmp(new Employee());
     }
 
+    private void btnSaveClick(ActionEvent event){
+        if(this.isForNew)
+            saveNew();
+        else
+            saveUpdate();
+    }
+
+    private void saveNew(){
+        Employee employee = this.getEmployee();
+    }
+
+    private void saveUpdate(){
+        Employee employee = this.getEmployee();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -166,7 +182,12 @@ public class MainFrame extends javax.swing.JFrame {
         table.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table);
         table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                tableClick();
+            }
+        });
         btnGetAll.setText("Get All");
 
         jLabel4.setText("Email");
