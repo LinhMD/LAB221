@@ -206,18 +206,16 @@ public class Employee implements Serializable, Comparable<Employee> {
 		return this.getEmpID().compareTo(o.getEmpID());
 	}
 
-	public static void main(String[] args) {
-		System.out.println("SE140063".matches(EMP_ID_FORMAT));
-		System.out.println("        ".matches(FULL_NAME_FORMAT));
-		System.out.println("maidinhlinh967@gmail.com".matches(EMAIL_FORMAT));
-		System.out.println("10020010100".matches(PHONE_FORMAT));
-		System.out.println("ajiskdnajb;2o3/13jinjasdf".matches(ADDRESS_FORMAT));
-		try {
-			System.out.println(DOB_FORMAT.parse("11/10/2000"));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-	}
-
-
+//	public static void main(String[] args) {
+//		System.out.println("SE140063".matches(EMP_ID_FORMAT));
+//		System.out.println("        ".matches(FULL_NAME_FORMAT));
+//		System.out.println("maidinhlinh967@gmail.com".matches(EMAIL_FORMAT));
+//		System.out.println("10020010100".matches(PHONE_FORMAT));
+//		System.out.println("ajiskdnajb;2o3/13jinjasdf".matches(ADDRESS_FORMAT));
+//		try {
+//			System.out.println(DOB_FORMAT.parse("11/10/2000"));
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }

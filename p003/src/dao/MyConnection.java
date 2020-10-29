@@ -20,9 +20,8 @@ public class MyConnection {
         }
     }
 
-    public static void main(String[] args) {
-        Connection connection = makeConnection();
-        System.out.println(connection);
-
-    }
+//    public static void main(String[] args) {
+//        Connection connection = makeConnection();
+//        System.out.println(connection);
+//    }
 }

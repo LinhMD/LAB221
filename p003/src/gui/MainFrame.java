@@ -99,12 +99,13 @@ public class MainFrame extends javax.swing.JFrame {
     private void changeState(boolean state){
         this.txtEmpID.setEnabled(state);
         this.isForNew = state;
+        if(state)
+            displayEmp(new Employee());
     }
 
     private void btnGetAllClick(ActionEvent event){
         this.employees = EmployeeDAO.getAllEmployee();
         loadTable();
-        displayEmp(new Employee());
         changeState(false);
     }
 
@@ -115,7 +116,6 @@ public class MainFrame extends javax.swing.JFrame {
     * */
     private void btnNewClick(ActionEvent event){
         this.changeState(true);
-        this.displayEmp(new Employee());
     }
 
     private void btnSaveClick(ActionEvent event){
@@ -135,7 +135,9 @@ public class MainFrame extends javax.swing.JFrame {
                 table.setRowSelectionInterval(index, index);
             }
             this.displayEmp(employee);
-        }
+            changeState(false);
+        }else
+            JOptionPane.showMessageDialog(null, "Not found!!!");
     }
 
     private void btnDeleteClick(ActionEvent event){
@@ -145,6 +147,7 @@ public class MainFrame extends javax.swing.JFrame {
         if(EmployeeDAO.updateEmployee(employee)){
             employees.remove(employee);
             this.loadTable();
+            this.displayEmp(new Employee());
             JOptionPane.showMessageDialog(null, "Delete employee " + employee + " successfully.");
         }else
             JOptionPane.showMessageDialog(null, "Delete employee " + employee + " failed!!!");
@@ -158,6 +161,7 @@ public class MainFrame extends javax.swing.JFrame {
                 this.employees.add(employee);
                 JOptionPane.showMessageDialog(null, "Add " + employee + " successfully.");
                 this.loadTable();
+                changeState(false);
             }else //somehow add failed?
                 JOptionPane.showMessageDialog(null, "Add employee" + employee + " failed!!!");
         }else //found
@@ -170,6 +174,8 @@ public class MainFrame extends javax.swing.JFrame {
         if(EmployeeDAO.updateEmployee(employee)){
             this.employees.set(employees.indexOf(employee), employee);
             JOptionPane.showMessageDialog(null, "Update " + employee + " successfully.");
+            loadTable();
+
         }else
             JOptionPane.showMessageDialog(null, "Update " + employee + " Failed!!!");
     }
@@ -391,7 +397,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         EventQueue.invokeLater(() ->{
