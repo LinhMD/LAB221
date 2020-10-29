@@ -11,6 +11,7 @@ import dto.Employee;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -100,6 +101,13 @@ public class MainFrame extends javax.swing.JFrame {
         this.isForNew = state;
     }
 
+    private void btnGetAllClick(ActionEvent event){
+        this.employees = EmployeeDAO.getAllEmployee();
+        loadTable();
+        displayEmp(new Employee());
+        changeState(false);
+    }
+
     /*
     * when click new btn
     * change state to save for new
@@ -130,6 +138,18 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    private void btnDeleteClick(ActionEvent event){
+        int selectedRow = table.getSelectedRow();
+        Employee employee = (Employee) table.getModel().getValueAt(selectedRow, 0);
+        employee.setDelete(true);
+        if(EmployeeDAO.updateEmployee(employee)){
+            employees.remove(employee);
+            this.loadTable();
+            JOptionPane.showMessageDialog(null, "Delete employee " + employee + " successfully.");
+        }else
+            JOptionPane.showMessageDialog(null, "Delete employee " + employee + " failed!!!");
+    }
+
     private void saveNew(){
         Employee employee = this.getEmployee();
         if(employee == null) return;
@@ -152,7 +172,6 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Update " + employee + " successfully.");
         }else
             JOptionPane.showMessageDialog(null, "Update " + employee + " Failed!!!");
-
     }
 
 
@@ -222,16 +241,21 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         btnGetAll.setText("Get All");
+        btnGetAll.addActionListener(this::btnGetAllClick);
 
         jLabel4.setText("Email");
 
         btnCreate.setText("Create");
+        btnCreate.addActionListener(this::btnNewClick);
 
         btnSave.setText("Save");
+        btnSave.addActionListener(this::btnSaveClick);
 
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(this::btnDeleteClick);
 
         btnFindEmpByID.setText("Find by EmpID");
+        btnFindEmpByID.addActionListener(this::btnFindEMpByIDClick);
 
         jLabel5.setText("Address");
 
@@ -363,8 +387,19 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
-
+        EventQueue.invokeLater(() ->{
+            MainFrame mainFrame = new MainFrame();
+            mainFrame.setVisible(true);
+            mainFrame.setLocationRelativeTo(null);
+        });
+    }
 
    
 
