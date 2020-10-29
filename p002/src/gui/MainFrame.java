@@ -96,7 +96,7 @@ public class MainFrame extends javax.swing.JFrame {
                 } else
                     JOptionPane.showMessageDialog(null, "Delete armor " + id + " failed!!!");
             }catch (Exception ex){
-                ex.printStackTrace();
+//                ex.printStackTrace();
                 JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
             }
         }
@@ -119,7 +119,7 @@ public class MainFrame extends javax.swing.JFrame {
             } else
                 JOptionPane.showMessageDialog(null, "Update armor " + updatedArmor.getArmorID() + " failed!!!");
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
@@ -142,7 +142,7 @@ public class MainFrame extends javax.swing.JFrame {
             } else
                 JOptionPane.showMessageDialog(null, "Add armor " + armor.getArmorID() + " failed!!!");
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
@@ -168,7 +168,7 @@ public class MainFrame extends javax.swing.JFrame {
             this.armorList = (Vector<ArmorDTO>) this.armorI.findAllArmor();
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(null, e.getCause().getMessage());
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         this.loadTable();
     }
@@ -183,7 +183,7 @@ public class MainFrame extends javax.swing.JFrame {
             this.loadTable();
             this.isForNew = false;
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getCause().getMessage());
         }
     }
@@ -412,7 +412,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         java.awt.EventQueue.invokeLater(() -> {
@@ -421,7 +421,7 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.setVisible(true);
                 mainFrame.setLocationRelativeTo(null);
             } catch (NotBoundException | RemoteException | MalformedURLException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         });
     }

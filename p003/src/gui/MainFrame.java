@@ -144,12 +144,12 @@ public class MainFrame extends javax.swing.JFrame {
         int selectedRow = table.getSelectedRow();
         Employee employee = (Employee) table.getModel().getValueAt(selectedRow, 0);
         employee.setDelete(true);
-        if(EmployeeDAO.updateEmployee(employee)){
+        if(EmployeeDAO.updateEmployee(employee)){//delete success
             employees.remove(employee);
             this.loadTable();
             this.displayEmp(new Employee());
             JOptionPane.showMessageDialog(null, "Delete employee " + employee + " successfully.");
-        }else
+        }else//delete failed
             JOptionPane.showMessageDialog(null, "Delete employee " + employee + " failed!!!");
     }
 
