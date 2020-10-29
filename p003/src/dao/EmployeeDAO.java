@@ -21,7 +21,6 @@ public class EmployeeDAO {
 				}catch (IllegalArgumentException ex){
 					ex.printStackTrace();
 				}
-
 			}
 			return employees;
 		} catch (Exception e) {
