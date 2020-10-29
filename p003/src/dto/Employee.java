@@ -20,6 +20,7 @@ public class Employee implements Serializable, Comparable<Employee> {
 	public static final String PHONE_FORMAT = "^\\d{0,15}$";
 	public static final String ADDRESS_FORMAT = "^.{0,300}$";
 	public static final SimpleDateFormat DOB_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+
 	//also set lenient to false bc no mercy for the sinful in lord's eye
 	static {
 		DOB_FORMAT.setLenient(false);
@@ -212,7 +213,7 @@ public class Employee implements Serializable, Comparable<Employee> {
 		System.out.println("10020010100".matches(PHONE_FORMAT));
 		System.out.println("ajiskdnajb;2o3/13jinjasdf".matches(ADDRESS_FORMAT));
 		try {
-			System.out.println(DOB_FORMAT.parse("12/10/2020"));
+			System.out.println(DOB_FORMAT.parse("11/10/2000"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

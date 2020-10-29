@@ -39,6 +39,7 @@ public class SQLQuery {
 			while (rs.next()) {
 				Vector<String> rowData = new Vector<>();
 				for (index = 1; index <= columnsNumber; index++) rowData.add(rs.getString(index));
+				System.out.println(rowData);
 				dataTable.add(rowData);
 			}
 		} catch (Exception ex) {
