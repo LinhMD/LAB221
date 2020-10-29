@@ -94,7 +94,7 @@ public class ServerRemote extends UnicastRemoteObject implements ArmorInterface 
 
 
 		} catch (Exception exception) {
-			exception.printStackTrace();
+//			exception.printStackTrace();
 		}
 	}
 }
