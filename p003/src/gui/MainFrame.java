@@ -6,6 +6,7 @@
 package gui;
 
 
+import dao.EmployeeDAO;
 import dto.Employee;
 
 import javax.swing.*;
@@ -116,13 +117,45 @@ public class MainFrame extends javax.swing.JFrame {
             saveUpdate();
     }
 
+    private void btnFindEMpByIDClick(ActionEvent event){
+        Employee employee = EmployeeDAO.findEmployee(this.txtEmpID.getText());
+        if(employee != null){
+            if(!employees.contains(employee)){
+                employees.add(employee);
+            }else {
+                int index = employees.indexOf(employee);
+                table.setRowSelectionInterval(index, index);
+            }
+            this.displayEmp(employee);
+        }
+    }
+
     private void saveNew(){
         Employee employee = this.getEmployee();
+        if(employee == null) return;
+        if(EmployeeDAO.findEmployee(employee.getEmpID()) == null){//not found
+            if(EmployeeDAO.insertEmployee(employee)){
+                this.employees.add(employee);
+                JOptionPane.showMessageDialog(null, "Add " + employee + " successfully.");
+                this.loadTable();
+            }else //somehow add failed?
+                JOptionPane.showMessageDialog(null, "Add employee" + employee + " failed!!!");
+        }else //found
+            JOptionPane.showMessageDialog(null, "EmpID duplicate!!!");
     }
 
     private void saveUpdate(){
         Employee employee = this.getEmployee();
+        if(employee == null) return;
+        if(EmployeeDAO.updateEmployee(employee)){
+            this.employees.set(employees.indexOf(employee), employee);
+            JOptionPane.showMessageDialog(null, "Update " + employee + " successfully.");
+        }else
+            JOptionPane.showMessageDialog(null, "Update " + employee + " Failed!!!");
+
     }
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
