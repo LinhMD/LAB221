@@ -128,12 +128,12 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnFindEMpByIDClick(ActionEvent event){
         Employee employee = EmployeeDAO.findEmployee(this.txtEmpID.getText());
         if(employee != null){
-            if(!employees.contains(employee)){
+            if(!employees.contains(employee))
                 employees.add(employee);
-            }else {
-                int index = employees.indexOf(employee);
-                table.setRowSelectionInterval(index, index);
-            }
+//            }else {
+//                int index = employees.indexOf(employee);
+//                table.setRowSelectionInterval(index, index);
+//            }
             this.displayEmp(employee);
             changeState(false);
         }else
