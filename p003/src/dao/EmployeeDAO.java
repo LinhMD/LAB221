@@ -43,8 +43,33 @@ public class EmployeeDAO {
 		return null;
 	}
 
+	public static boolean insertEmployee(Employee employee){
+		String sqlStatement = "insert into tblEmployee(EmpID, Fullname, Address, Phone, Email, DateOfBirth, isDelete)\n" +
+				"values(?, ?, ?, ?, ?, ?, ?)\n";
+		try{
+			return SQLQuery.executeNonQuery(sqlStatement, employee.getEmpID(), employee.getFullName(), employee.getAddress(), employee.getPhone(), employee.getEmail(), employee.getDOB(), 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public static boolean deleteEmployee(String EmpID){
+		String sql = "delete tblEmployee\n" +
+				"where EmpID = ?";
+		try{
+			return SQLQuery.executeNonQuery(sql, EmpID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public static void main(String[] args) {
 		System.out.println(getAllEmployee());
 		System.out.println(findEmployee("ID1"));
+		Employee employee = new Employee("AD", "linh", "nha", "01002", "Email@email", "06/12/2000");
+		System.out.println(insertEmployee(employee));
+		System.out.println(deleteEmployee("AD"));
 	}
 }
