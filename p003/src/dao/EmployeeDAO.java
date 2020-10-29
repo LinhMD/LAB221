@@ -15,13 +15,12 @@ public class EmployeeDAO {
 		try {
 			Vector<Vector<String>> table = SQLQuery.executeQuery(sqlStatement);
 			if(table == null) return employees;
-			for (Vector<String> row : table) {
-				try{
+			for (Vector<String> row : table)
+				try {
 					employees.add(new Employee(row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), Employee.DOB_FORMAT.format(SQL_DATA_FORMAT.parse(row.get(5)))));
-				}catch (IllegalArgumentException ex){
+				} catch (IllegalArgumentException ex) {
 					ex.printStackTrace();
 				}
-			}
 			return employees;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,8 +38,8 @@ public class EmployeeDAO {
 			return new Employee(row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), Employee.DOB_FORMAT.format(SQL_DATA_FORMAT.parse(row.get(5))));
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 
 	public static boolean insertEmployee(Employee employee){
@@ -50,8 +49,9 @@ public class EmployeeDAO {
 			return SQLQuery.executeNonQuery(sqlStatement, employee.getEmpID(), employee.getFullName(), employee.getAddress(), employee.getPhone(), employee.getEmail(), employee.getDOB(), 0);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
-		return false;
+
 	}
 
 	public static boolean deleteEmployee(String EmpID){
@@ -61,8 +61,27 @@ public class EmployeeDAO {
 			return SQLQuery.executeNonQuery(sql, EmpID);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
-		return false;
+
+	}
+
+	public static boolean updateEmployee(Employee employee){
+		String sql = "update tblEmployee\n" +
+				"set Fullname = ?,Phone = ?, Email = ?, Address = ?, DateOfBirth = ?, isDelete = ?\n" +
+				"where EmpID = ?";
+		try{
+			return SQLQuery.executeNonQuery(sql, employee.getFullName(),
+												employee.getPhone(),
+												employee.getEmail(),
+												employee.getAddress(),
+												employee.getDOB(),
+												employee.isDelete(),
+												employee.getEmpID());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public static void main(String[] args) {
