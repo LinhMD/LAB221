@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/Structs2">
+    <Resource password="123456" username="sa" url="jdbc:sqlserver://localhost:1433;databaseName=StudentManager" 
+            driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver" 
+            auth="Container" type="javax.sql.DataSource" name="SE1419DS"/>
+</Context>

@@ -186,8 +186,8 @@ public class ArmorDTO implements Serializable {
 	 * */
 	public static Vector<String> getHeaderInfo(){
 //		String [] headerInfo = new String[]{"ArmorID", "Classification", "Description", "Status", "Time Of Create", "Defence"};
-		String [] headerInfo = new String[]{"ArmorID", "Classification", "Time Of Create", "Defence"};
-		return new Vector<>(Arrays.asList(headerInfo));
+//		String [] headerInfo = new String[]{"ArmorID", "Classification", "Time Of Create", "Defence"};
+		return new Vector<>(Arrays.asList("ArmorID", "Classification", "Time Of Create", "Defence"));
 	}
 
 	public Vector<Object> toVector(){
