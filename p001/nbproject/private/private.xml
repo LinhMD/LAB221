@@ -5,8 +5,9 @@
         <group>
             <file>file:/E:/Classes/LAB221/p001/src/gui/LoginFrame.java</file>
             <file>file:/E:/Classes/LAB221/p001/src/gui/MainFrame.java</file>
-            <file>file:/E:/Classes/LAB221/p001/src/utills/MyConnection.java</file>
             <file>file:/E:/Classes/LAB221/p001/src/gui/SupplierPanel.java</file>
+            <file>file:/E:/Classes/LAB221/p001/src/dao/DAO.java</file>
+            <file>file:/E:/Classes/LAB221/p001/src/utills/MyConnection.java</file>
         </group>
     </open-files>
 </project-private>

@@ -16,7 +16,28 @@
             <result name="fail" type="redirect">invalid.html</result>
         </action>
         <action name="searchLastName" class="LinhMD.structs2.SearchLastNameAction" method="searchLastName">
-            <result>search.jsp</result>
+            <result name="suceess">search.jsp</result>
+        </action>
+        <action name="delete" class="LinhMD.structs2.DeleteAction" method="deleteAccount">
+            <result type="redirectAction" name="success">
+                <param name="actionName" >searchLastName</param>
+                <param name="searchValue">${lastSearchValue}</param>
+            </result>
+            <result name="fail" type="redirect">errors.html</result>
+        </action>
+        <action name="update" class="LinhMD.structs2.UpdateAction" method="updateAccount">
+            <result type="redirectAction" name="success">
+                <param name="actionName" >searchLastName</param>
+                <param name="searchValue">${lastSearchValue}</param>
+            </result>
+            <result name="fail" type="redirect">errors.html</result>
+        </action>
+        <action name="create" class="LinhMD.structs2.SignUpAction" method="signUp">
+            <result name="success">index.html</result>
+            <result name="input">createNew.jsp</result>
+        </action>
+        <action name="logout" class="LinhMD.structs2.LogoutAction" method="logout">
+            <result>index.html</result>
         </action>
     </package>
 </struts>

@@ -40,7 +40,12 @@ public class MainFrame extends javax.swing.JFrame {
     * then set table model
     * */
     private void loadTable(){
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = new DefaultTableModel(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         model.setColumnIdentifiers(Employee.getHeader());
 //        EmpListSingleton.getInstance().stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
         employees.stream().filter(e -> !e.isDelete()).forEach(e -> model.addRow(e.toVector()));
@@ -97,7 +102,7 @@ public class MainFrame extends javax.swing.JFrame {
     * change state save for new(true)/update(false)
     * */
     private void changeState(boolean state){
-        this.txtEmpID.setEnabled(state);
+        this.txtEmpID.setEnabled(!state);
         this.isForNew = state;
         if(state)
             displayEmp(new Employee());
@@ -192,7 +197,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
+        table = new MyTable();
         btnGetAll = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -217,35 +222,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel1.setText("Employee Management");
 
-        table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        table.setColumnSelectionAllowed(true);
-        table.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(table);
-        table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 tableClick();
             }
         });
+
         btnGetAll.setText("Get All");
         btnGetAll.addActionListener(this::btnGetAllClick);
 

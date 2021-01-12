@@ -31,7 +31,6 @@ public class LoginAction {
             url = SUCCESS;
             Map<String, Object> session = ActionContext.getContext().getSession();
             session.put("USERNAME", username);
-            
         }
         return url;
         
