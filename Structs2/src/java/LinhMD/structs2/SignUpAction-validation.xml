@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<!DOCTYPE validators PUBLIC
+  		"-//Apache Struts//XWork Validator 1.0.3//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+    <field name="userName">
+        <field-validator type="requiredstring">
+            <param name="trim">true</param>
+            <message>Username is required</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="trim">true</param>
+            <param name="minLength">6</param>
+            <param name="maxLength">30</param>
+            <message>Username is require 6-30 characters</message>
+        </field-validator>
+    </field>
+    <field name="passWord">
+        <field-validator type="requiredstring">
+            <param name="trim">true</param>
+            <message>Password required</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="trim">true</param>
+            <param name="minLength">6</param>
+            <param name="maxLength">20</param>
+            <message>Password is require 6-20 characters</message>
+        </field-validator>
+    </field>
+    <field name="fullName">
+        <field-validator type="requiredstring">
+            <param name="trim">true</param>
+            <message>Fullname is required</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="trim">true</param>
+            <param name="minLength">2</param>
+            <param name="maxLength">50</param>
+            <message>Username is require 2-50 characters</message>
+        </field-validator>
+    </field>
+    <field name="comfirm">
+        <field-validator type="expression">
+            <param name="expression">comfirm==passWord</param>
+            <message>Comfirm must match password</message>
+        </field-validator>
+    </field>
+</validators>
