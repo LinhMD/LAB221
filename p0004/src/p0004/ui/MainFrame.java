@@ -5,6 +5,23 @@
  */
 package p0004.ui;
 
+import p0004.dao.BookDAO;
+import p0004.dto.Book;
+import p0004.error.BookInvalidException;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Vector;
+
+import static java.util.Calendar.YEAR;
+import static java.util.Calendar.getInstance;
+
 /**
  *
  * @author USER
@@ -14,8 +31,223 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainFrame
      */
+    private final BookDAO dao = new BookDAO();
+    private Vector<Book> books = new Vector<>();
+
+    private boolean isForNew = true;
+
     public MainFrame() {
+        this.setTitle("Book Management");
+        this.setResizable(false);
         initComponents();
+        loadTable();
+        this.publishedYear.setModel(new SpinnerNumberModel(getInstance().get(YEAR), 0, getInstance().get(YEAR), 1));
+    }
+
+    private void loadTable(){
+        DefaultTableModel model = new DefaultTableModel(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        model.setColumnIdentifiers(Book.getHeaderData());
+        books.forEach(f -> model.addRow(f.toVector()));
+        this.table.setModel(model);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    }
+
+    public void getAllButtonClick(ActionEvent event){
+        try{
+            this.books = dao.getAllBook();
+            this.sortBySelected(event);
+            this.loadTable();
+        }catch(BookInvalidException b){
+            JOptionPane.showMessageDialog(null, b.toString());
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+        
+    }
+
+    public void showBook(Book book){
+        if(book == null) return;
+        this.txtBookID.setText(book.getId());
+        this.txtBookName.setText(book.getName());
+        this.txtAuthor.setText(book.getAuthor());
+        this.txtPublisher.setText(book.getPublisher());
+        this.publishedYear.setValue(book.getPublishedYear());
+        this.forRentCheckBox.setSelected(book.isForRent());
+    }
+
+    public void setState(boolean state){//true mean for new, false mean for update
+        this.isForNew = state;
+        this.txtBookID.setEnabled(state);
+    }
+
+    public void tableClick(){
+        TableModel model = this.table.getModel();
+        Book book = (Book) model.getValueAt(table.getSelectedRow(), 0);
+        this.setState(false);
+        this.showBook(book);
+    }
+
+    public void clearView(){
+        this.txtBookID.setText("");
+        this.txtBookName.setText("");
+        this.txtAuthor.setText("");
+        this.txtPublisher.setText("");
+        this.publishedYear.setValue(getInstance().get(YEAR));
+        this.forRentCheckBox.setSelected(true);
+    }
+
+    private Book getBookFromDisplay(){
+        String id = this.txtBookID.getText();
+        String name = this.txtBookName.getText();
+        String author = this.txtAuthor.getText();
+        String publisher = this.txtPublisher.getText();
+        int year = ((int) this.publishedYear.getValue());
+        boolean forRent = this.forRentCheckBox.isSelected();
+//        System.out.println("here");
+        try {
+            return new Book(id, name, author, publisher, year +"", forRent? "1": "0");
+        } catch (BookInvalidException e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+            return null;
+        }
+    }
+
+    public void addNewButtonClick(ActionEvent event){
+        this.clearView();
+        this.setState(true);
+    }
+
+    public void saveButtonClick(ActionEvent event){
+        if(this.isForNew){
+            saveNew();
+        }else {
+            saveUpdate();
+        }
+    }
+
+    public void saveNew(){
+        Book book = this.getBookFromDisplay();
+        if(book == null) return;
+        try{
+            if(dao.insertBook(book))
+                if(this.books.add(book))
+                    JOptionPane.showMessageDialog(null, "Add book " + book + " successfully!");
+            else JOptionPane.showMessageDialog(null, "Add book " + book + " failed!!!");
+            loadTable();
+        }catch(BookInvalidException b){
+            JOptionPane.showMessageDialog(null, b.toString());
+        }catch(Exception e){
+            if(e.getMessage().contains("duplicate"))
+                JOptionPane.showMessageDialog(null, "Book id: " + book.getId() + "duplicate!!!");
+            else
+                JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+    }
+
+    public void saveUpdate(){
+        Book book = this.getBookFromDisplay();
+        if(book == null) return;
+        try{
+            if(dao.updateBook(book))
+                if(this.books.set(books.indexOf(book), book) != null)
+                    JOptionPane.showMessageDialog(null, "Update book " + book + " successfully!");
+            else JOptionPane.showMessageDialog(null, "Update book " + book + " failed!!!");
+            loadTable();
+        }catch(BookInvalidException b){
+            JOptionPane.showMessageDialog(null, b.toString());
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+    }
+    
+    public void findByIDClick(ActionEvent event){
+        String id = this.txtBookID.getText();
+        try{
+            Book book = dao.findBookByID(id);
+            if(book != null){
+                displayFoundBook(book);
+            }else{
+                JOptionPane.showMessageDialog(null, "Book id: " + id +" not found!!!" );
+            }
+        }catch(BookInvalidException b){
+            JOptionPane.showMessageDialog(null, b.toString());
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+    }
+    public void findByNameClick(ActionEvent event){
+        String name = this.txtSearchByName.getText();
+        try{
+            Book book = dao.findBookByName(name);
+            if(book != null){
+                displayFoundBook(book);
+            }else{
+                JOptionPane.showMessageDialog(null, "Book name: " + name +" not found!!!" );
+            }
+        }catch(BookInvalidException b){
+            JOptionPane.showMessageDialog(null, b.toString());
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+    }
+
+    private void displayFoundBook(Book book) {
+        this.showBook(book);
+        if(!this.books.contains(book)){
+            this.books.add(book);
+        }
+        this.sortBySelected(null);
+        this.loadTable();
+        int i = books.indexOf(book);
+        this.table.setRowSelectionInterval(i, i);
+        this.setState(false);
+    }
+
+    public void sortBySelected(ActionEvent event){
+        String sortBy = (String) sortByName.getSelectedItem();
+        if(Objects.equals(sortBy, "Ascending")){
+            this.books.sort(Comparator.comparing(Book::getName));
+        }else
+            this.books.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
+        loadTable();
+        
+    }
+
+    public void deleteButtonClick(ActionEvent event){
+        if(this.isForNew) {
+            JOptionPane.showMessageDialog(null, "Please choose a book to delete!!!");
+            return;
+        }
+        String bookID = this.txtBookID.getText();
+        if(bookID == null || bookID.trim().isEmpty()) return;
+        int option = JOptionPane.showConfirmDialog(null, "Do you want to delete " + bookID + "?");
+        if(JOptionPane.YES_OPTION == option){
+            try{
+                if (dao.deleteBookByID(bookID)){
+                    this.books.remove(new Book(bookID));
+                    JOptionPane.showMessageDialog(null, "Delete book ID: " + bookID + " successfully!");
+                    loadTable();
+                }   
+                else
+                    JOptionPane.showMessageDialog(null, "Delete book ID: " + bookID + " failed!");
+            }catch(BookInvalidException b){
+                JOptionPane.showMessageDialog(null, b.toString());
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+            
+        }
+
     }
 
     /**
@@ -30,7 +262,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         sortByName = new javax.swing.JComboBox<>();
         txtSearchByName = new javax.swing.JTextField();
@@ -48,8 +280,8 @@ public class MainFrame extends javax.swing.JFrame {
         txtAuthor = new javax.swing.JTextField();
         txtPublisher = new javax.swing.JTextField();
         publishedYear = new javax.swing.JSpinner();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jButton4 = new javax.swing.JButton();
+        forRentCheckBox = new javax.swing.JCheckBox();
+        btnAddNew = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         btnRemove = new javax.swing.JButton();
 
@@ -58,7 +290,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Book management");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -77,18 +309,27 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setColumnSelectionAllowed(true);
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
+        table.setColumnSelectionAllowed(true);
+        table.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(table);
+        table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                tableClick();
+            }
+        });
         jLabel2.setText("Sort by name:");
 
-        sortByName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        sortByName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ascending", "Descending" }));
+        sortByName.addActionListener(this::sortBySelected);
 
         btnSearchByName.setText("Search By Name");
+        btnSearchByName.addActionListener(this::findByNameClick);
 
         btnGetAll.setText("Get All Book");
+        btnGetAll.addActionListener(this::getAllButtonClick);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -129,13 +370,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel3.setText("Book ID");
 
-        txtBookID.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBookIDActionPerformed(evt);
-            }
-        });
-
         btnFindByID.setText("Find By ID");
+        btnFindByID.addActionListener(this::findByIDClick);
 
         jLabel4.setText("Book Name");
 
@@ -145,24 +381,19 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel7.setText("Published year");
 
-        txtPublisher.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPublisherActionPerformed(evt);
-            }
-        });
+        
 
-        jCheckBox1.setText("For rent");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
-            }
-        });
+        forRentCheckBox.setText("For rent");
+        
 
-        jButton4.setText("Add new");
+        btnAddNew.setText("Add new");
+        btnAddNew.addActionListener(this::addNewButtonClick);
 
         btnSave.setText("Save");
+        btnSave.addActionListener(this::saveButtonClick);
 
         btnRemove.setText("Remove");
+        btnRemove.addActionListener(this::deleteButtonClick);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -172,14 +403,14 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(forRentCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jButton4)
+                        .addComponent(btnAddNew)
                         .addGap(18, 18, 18)
                         .addComponent(btnSave)))
                 .addGap(18, 18, 18)
@@ -202,10 +433,11 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtBookID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnFindByID)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtBookID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnFindByID)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,10 +455,10 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(publishedYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jCheckBox1)
+                .addComponent(forRentCheckBox)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
+                    .addComponent(btnAddNew)
                     .addComponent(btnSave)
                     .addComponent(btnRemove))
                 .addContainerGap())
@@ -262,51 +494,17 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
-
-    private void txtBookIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBookIDActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtBookIDActionPerformed
-
-    private void txtPublisherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPublisherActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPublisherActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main(String[] args) {
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -315,8 +513,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSearchByName;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JButton btnAddNew;
+    private javax.swing.JCheckBox forRentCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -327,7 +525,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable table;
     private javax.swing.JSpinner publishedYear;
     private javax.swing.JComboBox<String> sortByName;
     private javax.swing.JTextField txtAuthor;
